@@ -87,8 +87,10 @@ services:
       RabbitMQ__URI: amqp://admin:admin123@fgc-rabbitmq:5672/
       RabbitMQ__OrderCreatedEvent__Exchange: fgc
       RabbitMQ__OrderCreatedEvent__RoutingKey: order.created
+      RabbitMQ__OrderCreatedEvent__QueueName: order.created
       RabbitMQ__PaymentProcessedEvent__Exchange: fgc
       RabbitMQ__PaymentProcessedEvent__RoutingKey: payment.processed
+      RabbitMQ__PaymentProcessedEvent__QueueName: catalog.payment.processed
     depends_on:
       sqlserver:
         condition: service_healthy
