@@ -58,7 +58,7 @@ services:
       Jwt__TokenTtlInMinutes: 10
       RootUser__FirstName: FirstName
       RootUser__LastName: LastName
-      RootUser__Email: admin@fgc.com
+      RootUser__Email: admin@cloudgames.com
       RootUser__Password: Admin@123
       RabbitMQ__URI: amqp://admin:admin123@fgc-rabbitmq:5672/
       RabbitMQ__UserCreatedEvent__Exchange: fgc
@@ -85,15 +85,17 @@ services:
       Jwt__Key: 8594df0eb5ecb4c96f8824462cc7d2e1885c138908f2f7b4357af54b72ab2ed6
       Jwt__TokenTtlInMinutes: 10      
       RabbitMQ__URI: amqp://admin:admin123@fgc-rabbitmq:5672/
-      RabbitMQ__UserCreatedEvent__Exchange: fgc
-      RabbitMQ__UserCreatedEvent__RoutingKey: user.created
+      RabbitMQ__OrderCreatedEvent__Exchange: fgc
+      RabbitMQ__OrderCreatedEvent__RoutingKey: order.created
+      RabbitMQ__PaymentProcessedEvent__Exchange: fgc
+      RabbitMQ__PaymentProcessedEvent__RoutingKey: payment.processed
     depends_on:
       sqlserver:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
   payment-service:
-    image: fgc-catalog-service:latest
+    image: fgc-payment-service:latest
     build:
       context: ../payment-service
       dockerfile: Dockerfile
@@ -111,6 +113,8 @@ services:
       RabbitMQ__URI: amqp://admin:admin123@fgc-rabbitmq:5672/
       RabbitMQ__UserCreatedEvent__Exchange: fgc
       RabbitMQ__UserCreatedEvent__RoutingKey: user.created
+      RabbitMQ__PaymentProcessedEvent__Exchange: fgc
+      RabbitMQ__PaymentProcessedEvent__RoutingKey: payment.processed
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -128,6 +132,8 @@ services:
       RabbitMQ__URI: amqp://admin:admin123@fgc-rabbitmq:5672/
       RabbitMQ__UserCreatedEvent__Exchange: fgc
       RabbitMQ__UserCreatedEvent__RoutingKey: user.created
+      RabbitMQ__PaymentProcessedEvent__Exchange: fgc
+      RabbitMQ__PaymentProcessedEvent__RoutingKey: payment.processed
     depends_on:
       rabbitmq:
         condition: service_healthy
