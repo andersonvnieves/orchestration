@@ -1,0 +1,42 @@
+info:
+  name: CreateGame
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{CatalogBaseURL}}api/Game"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Horizon Zero Dawn",
+        "description": "string",
+        "story": "string",
+        "price": 100,
+        "franchise": "Horizon Zero Dawn",
+        "releaseDate": "2026-06-26",
+        "ageRating": "A16",
+        "gameModes": [
+          "SinglePlayer"
+        ],
+        "publisher": "Playstatin Studios",
+        "developers": [
+          "Guerrilla"
+        ]
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const response = res.getBody();
+
+        bru.setEnvVar("GameId", response.id);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

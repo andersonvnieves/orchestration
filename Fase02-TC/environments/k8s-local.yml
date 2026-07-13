@@ -1,0 +1,8 @@
+name: k8s-local
+variables:
+  - name: UserBaseURL
+    value: http://localhost:30080/
+  - name: PaymentBaseURL
+    value: http://localhost:30080/
+  - name: CatalogBaseURL
+    value: http://localhost:30080/
