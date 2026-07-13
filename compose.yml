@@ -111,8 +111,8 @@ services:
       Jwt__Key: 8594df0eb5ecb4c96f8824462cc7d2e1885c138908f2f7b4357af54b72ab2ed6
       Jwt__TokenTtlInMinutes: 10      
       RabbitMQ__URI: amqp://admin:admin123@fgc-rabbitmq:5672/
-      RabbitMQ__UserCreatedEvent__Exchange: fgc
-      RabbitMQ__UserCreatedEvent__RoutingKey: user.created
+      RabbitMQ__OrderCreatedEvent__Exchange: fgc
+      RabbitMQ__OrderCreatedEvent__RoutingKey: order.created
       RabbitMQ__PaymentProcessedEvent__Exchange: fgc
       RabbitMQ__PaymentProcessedEvent__RoutingKey: payment.processed
     depends_on:
