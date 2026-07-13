@@ -1,0 +1,10 @@
+kubectl apply -f ..\catalog-service\k8s\catalog-service-stack.yml
+kubectl apply -f ..\notification-service\k8s\notification-service-stack.yml
+kubectl apply -f ..\payment-service\k8s\payment-service-stack.yml
+kubectl apply -f ..\user-service\k8s\user-service-stack.yml
+
+
+kubectl delete -f ..\catalog-service\k8s\catalog-service-stack.yml
+kubectl delete -f ..\notification-service\k8s\notification-service-stack.yml
+kubectl delete -f ..\payment-service\k8s\payment-service-stack.yml
+kubectl delete -f ..\user-service\k8s\user-service-stack.yml
