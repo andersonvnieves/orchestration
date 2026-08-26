@@ -53,9 +53,16 @@ certificates:
 
 snis:
   - id: f9e8d7c6-b5a4-3210-fedc-ba9876543210
-    name: fgc.local # O domínio ou hostname que vai usar o certificado
+    name: fgc.local
     certificate:
       id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+consumers:
+  - username: fgc-api-client
+    jwt_secrets:
+      - key: fgcapi
+        secret: 8594df0eb5ecb4c96f8824462cc7d2e1885c138908f2f7b4357af54b72ab2ed6
+        algorithm: HS256
 
 services:
   - name: catalog-service
@@ -71,14 +78,15 @@ services:
           - /api/library
         strip_path: false
         protocols: [https]
+        plugins:
+          - name: jwt
       - name: catalog-order-route
         paths:
           - /api/order
         strip_path: false
         protocols: [https]
-    plugins:
-      - name: jwt
-        service: catalog-service
+        plugins:
+          - name: jwt
 
   - name: users-service
     url: http://users-api-service.fgc.svc.cluster.local:80
@@ -93,6 +101,8 @@ services:
           - /api/user/role
         strip_path: false
         protocols: [https]
+        plugins:
+          - name: jwt
         
   - name: auth-service
     url: http://users-api-service.fgc.svc.cluster.local:80
@@ -111,8 +121,12 @@ services:
           - /api/payment/approve
         strip_path: false
         protocols: [https]
+        plugins:
+          - name: jwt
       - name: payment-decline-route
         paths:
           - /api/payment/decline
         strip_path: false
         protocols: [https]
+        plugins:
+          - name: jwt
