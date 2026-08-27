@@ -15,6 +15,7 @@ kubectl apply -f .\k8s\kong-service-stack.yml
 kubectl port-forward svc/kong-proxy-service -n fgc 30085:80
 kubectl port-forward svc/kong-proxy-service -n fgc 30443:443
 kubectl port-forward svc/grafana-service -n observability 3000:3000
+kubectl port-forward svc/prometheus-service -n observability 9090:9090
 
 
 kubectl delete -f ..\catalog-service\k8s\catalog-service-stack.yml

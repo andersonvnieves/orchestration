@@ -6,7 +6,7 @@ grafana:
 
 prometheus:
   prometheusSpec:
-    retention: 7d # Tempo que as métricas ficam salvas (ajuste conforme seu disco)
+    retention: 7d
     resources:
       requests:
         cpu: 500m
