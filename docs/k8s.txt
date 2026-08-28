@@ -1,0 +1,48 @@
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=fgc.local"
+
+=========================================================================================================
+#Build Images
+=========================================================================================================
+docker build -t fgc-catalog-service:latest -f ..\catalog-service\Dockerfile ..\catalog-service
+docker build -t fgc-payment-service:latest -f ..\payment-service\Dockerfile ..\payment-service
+docker build -t fgc-user-service:latest -f ..\user-service\Dockerfile ..\user-service
+
+=========================================================================================================
+#Apply Stack
+=========================================================================================================
+
+kubectl apply -f  k8s\observability\local\prometheus-service-stack.yaml 
+kubectl apply -f  k8s\observability\local\loki-service-stack.yaml
+kubectl apply -f  k8s\observability\base\promtail-daemon-stack.yaml
+kubectl apply -f  k8s\observability\local\grafana-service-stack.yaml
+
+kubectl apply -f ..\user-service\k8s\user-service-stack.yml
+
+kubectl apply -f ..\catalog-service\k8s\catalog-service-stack.yml
+
+kubectl apply -f ..\payment-service\k8s\payment-service-stack.yml
+
+kubectl apply -f .\k8s\api-gateway\local\kong-service-stack.yml
+
+=========================================================================================================
+#Port Forward
+=========================================================================================================
+
+kubectl port-forward svc/kong-proxy-service -n fgc 30443:443
+kubectl port-forward svc/grafana-service -n observability 3000:3000
+kubectl port-forward svc/prometheus-service -n observability 9090:9090
+
+#Rabbit
+kubectl port-forward svc/rabbitmq-service -n fgc 15672:15672
+
+=========================================================================================================
+#Delete Stack
+=========================================================================================================
+kubectl delete -f  k8s\observability\local\prometheus-service-stack.yaml 
+kubectl delete -f  k8s\observability\local\loki-service-stack.yaml
+kubectl delete -f  k8s\observability\base\promtail-daemon-stack.yaml
+kubectl delete -f  k8s\observability\local\grafana-service-stack.yaml
+kubectl delete -f ..\catalog-service\k8s\catalog-service-stack.yml
+kubectl delete -f ..\payment-service\k8s\payment-service-stack.yml
+kubectl delete -f ..\user-service\k8s\user-service-stack.yml
+kubectl delete -f .\k8s\api-gateway\local\kong-service-stack.yml

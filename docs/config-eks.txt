@@ -1,0 +1,11 @@
+#Configurar o EKS
+aws eks update-kubeconfig --region us-east-1 --name fgc
+
+
+Deletar cluster
+1. Listar todos os clusters configurados
+kubectl config get-contexts
+2. Alternar entre os clusters
+kubectl config use-context nome-do-contexto
+3. Remover permanentemente o cluster EKS do kubectl (Opcional)
+kubectl config delete-context arn:aws:eks:regiao:conta-id:cluster/fgc

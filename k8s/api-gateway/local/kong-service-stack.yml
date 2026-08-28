@@ -1,6 +1,6 @@
-apiVersion: v1
-kind: Namespace
-metadata: { name: fgc }
+# apiVersion: v1
+# kind: Namespace
+# metadata: { name: fgc }
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -91,6 +91,9 @@ data:
             protocols: [https]
             plugins:
               - name: jwt
+                config:
+                  header_names: [authorization]
+                  claims_to_verify: [exp]
           - name: catalog-order-route
             paths:
               - /api/order
@@ -98,15 +101,13 @@ data:
             protocols: [https]
             plugins:
               - name: jwt
+                config:
+                  header_names: [authorization]
+                  claims_to_verify: [exp]
 
       - name: users-service
         url: http://users-api-service.fgc.svc.cluster.local:80
         routes:
-          - name: user-register-get-route
-            paths:
-              - /api/user
-            strip_path: false
-            protocols: [https]
           - name: user-role-route
             paths:
               - /api/user/role
@@ -114,6 +115,14 @@ data:
             protocols: [https]
             plugins:
               - name: jwt
+                config:
+                  header_names: [authorization]
+                  claims_to_verify: [exp]
+          - name: user-register-get-route
+            paths:
+              - /api/user
+            strip_path: false
+            protocols: [https]
             
       - name: auth-service
         url: http://users-api-service.fgc.svc.cluster.local:80
@@ -134,6 +143,9 @@ data:
             protocols: [https]
             plugins:
               - name: jwt
+                config:
+                  header_names: [authorization]
+                  claims_to_verify: [exp]
           - name: payment-decline-route
             paths:
               - /api/payment/decline
@@ -141,6 +153,9 @@ data:
             protocols: [https]
             plugins:
               - name: jwt
+                config:
+                  header_names: [authorization]
+                  claims_to_verify: [exp]
 ---
 apiVersion: apps/v1
 kind: Deployment

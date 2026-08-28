@@ -80,6 +80,9 @@ services:
         protocols: [https]
         plugins:
           - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
       - name: catalog-order-route
         paths:
           - /api/order
@@ -87,15 +90,13 @@ services:
         protocols: [https]
         plugins:
           - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
 
   - name: users-service
     url: http://users-api-service.fgc.svc.cluster.local:80
     routes:
-      - name: user-register-get-route
-        paths:
-          - /api/user
-        strip_path: false
-        protocols: [https]
       - name: user-role-route
         paths:
           - /api/user/role
@@ -103,6 +104,14 @@ services:
         protocols: [https]
         plugins:
           - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
+      - name: user-register-get-route
+        paths:
+          - /api/user
+        strip_path: false
+        protocols: [https]
         
   - name: auth-service
     url: http://users-api-service.fgc.svc.cluster.local:80
@@ -123,6 +132,9 @@ services:
         protocols: [https]
         plugins:
           - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
       - name: payment-decline-route
         paths:
           - /api/payment/decline
@@ -130,3 +142,6 @@ services:
         protocols: [https]
         plugins:
           - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]

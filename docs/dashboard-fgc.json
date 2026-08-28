@@ -102,7 +102,9 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": [],
+          "calcs": [
+            "last"
+          ],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
@@ -112,6 +114,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "10.1.0",
       "targets": [
         {
           "datasource": {
@@ -119,8 +122,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum by(status) (rate(http_requests_received_total{job=\"kubernetes-pods\", app=~\"$app\"}[1h]))",
+          "editorMode": "code",
+          "expr": "sum by(app, code) (increase(http_requests_received_total{job=\"kubernetes-pods\", app=~\"$app\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -130,7 +133,8 @@
           "useBackend": false
         }
       ],
-      "title": "Contagem de Requisições por Status Code HTTP",
+      "title": "Contagem  Total de Requisições",
+      "transparent": true,
       "type": "timeseries"
     },
     {
@@ -218,7 +222,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(method, path) (rate(http_requests_received_total{app=~\"$app\"}[1h]))",
+          "expr": "sum by(method, path, code) (rate(http_requests_received_total{app=~\"$app\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -228,7 +232,8 @@
           "useBackend": false
         }
       ],
-      "title": "Contagem Total de Requisições (Taxa por Segundo / Throughput)",
+      "title": "Contagem Total de Requisições (por status code)",
+      "transparent": true,
       "type": "timeseries"
     },
     {
@@ -316,7 +321,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(code) (rate(http_requests_received_total{app=~\"$app\"}[1h]))",
+          "expr": "sum by(code) (rate(http_requests_received_total{app=~\"$app\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -327,6 +332,7 @@
         }
       ],
       "title": "Taxa de Erros (Error Rate - HTTP 5xx e 4xx)",
+      "transparent": true,
       "type": "timeseries"
     },
     {
@@ -414,7 +420,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(le, method) (rate(http_request_duration_seconds_bucket{job=\"kubernetes-pods\", app=~\"$app\"}[1h])))",
+          "expr": "histogram_quantile(0.95, sum by(le, method) (rate(http_request_duration_seconds_bucket{job=\"kubernetes-pods\", app=~\"$app\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -425,10 +431,11 @@
         }
       ],
       "title": "Latência de Requisições (Tempo de Resposta - p95 e p99)",
+      "transparent": true,
       "type": "timeseries"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "schemaVersion": 38,
   "style": "dark",
   "tags": [],
@@ -443,6 +450,10 @@
           "value": [
             "$__all"
           ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
         "definition": "label_values(app)",
         "hide": 0,
@@ -471,6 +482,6 @@
   "timezone": "",
   "title": "FGC",
   "uid": "d8895324-aa23-48ae-9749-ea32bf7e4f68",
-  "version": 5,
+  "version": 2,
   "weekStart": ""
 }

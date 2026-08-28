@@ -36,3 +36,12 @@ docker compose down
 ```
 
 `docker compose down` preserva os volumes. Para remover também os dados locais de SQL Server e RabbitMQ, execute `docker compose down -v`.
+
+
+
+aws cloudformation deploy --template-file fgc-template-cloudformation.yaml --stack-name fgc-stack --capabilities CAPABILITY_IAM
+
+aws cloudformation delete-stack  --stack-name fgc-stack
+
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 257500279765.dkr.ecr.us-east-1.amazonaws.com

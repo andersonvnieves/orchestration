@@ -1,6 +1,6 @@
 grafana:
   enabled: true
-  adminPassword: "admin" # Troque para uma senha segura depois
+  adminPassword: "admin"
   service:
     type: ClusterIP # Ou LoadBalancer / NodePort dependendo de como você acessa o cluster
 

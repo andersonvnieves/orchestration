@@ -1,0 +1,11 @@
+#Criar stacks do cloudformation
+
+aws cloudformation deploy --template-file cloudformation\sqs-stack.yaml --stack-name fgc-sqs-stack --capabilities CAPABILITY_IAM
+aws cloudformation deploy --template-file cloudformation\ecr-stack.yaml --stack-name fgc-ecr-stack --capabilities CAPABILITY_IAM
+aws cloudformation deploy --template-file cloudformation\eks-stack.yaml --stack-name fgc-eks-stack --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn=arn:aws:iam::257500279765:role/c216487a5468316l16405111t1w257500-LabEksClusterRole-78wzGrTetQnv NodeRoleArn=arn:aws:iam::257500279765:role/c216487a5468316l16405111t1w257500-LabEksClusterRole-78wzGrTetQnv SubnetIds=subnet-0c9cc2e65754492dc,subnet-0b3e9d99197113d4f
+
+
+#Deletar stacks do cloudformation
+aws cloudformation delete-stack --stack-name fgc-sqs-stack
+aws cloudformation delete-stack --stack-name fgc-ecr-stack
+aws cloudformation delete-stack --stack-name fgc-eks-stack

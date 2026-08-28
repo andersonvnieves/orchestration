@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Template CloudFormation FGC - ECR"  
+
+Resources:
+  UserServiceRegistry:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: "fgc-user-service"
+      ImageTagMutability: MUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: false
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Manter apenas as últimas 5 imagens",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 5
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+
+  CatalogServiceRegistry:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: "fgc-catalog-service"
+      ImageTagMutability: MUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: false
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Manter apenas as últimas 5 imagens",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 5
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+
+  PaymentServiceRegistry:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: "fgc-payment-service"
+      ImageTagMutability: MUTABLE
+      ImageScanningConfiguration:
+        ScanOnPush: false
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Manter apenas as últimas 5 imagens",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 5
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+
+Outputs:
+  UserServiceRepositoryUri:
+    Description: "URI do ECR do user-service"
+    Value: !GetAtt UserServiceRegistry.RepositoryUri
+    Export:
+      Name: "UserServiceRegistry-Uri"
+
+  CatalogServiceRepositoryUri:
+    Description: "URI do ECR do catalog-service"
+    Value: !GetAtt CatalogServiceRegistry.RepositoryUri
+    Export:
+      Name: "CatalogServiceRegistry-Uri"
+
+  PaymentServiceRepositoryUri:
+    Description: "URI do ECR do payment-service"
+    Value: !GetAtt PaymentServiceRegistry.RepositoryUri
+    Export:
+      Name: "PaymentServiceRegistry-Uri"
