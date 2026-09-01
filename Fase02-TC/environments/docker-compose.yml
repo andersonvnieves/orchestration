@@ -1,8 +1,0 @@
-name: docker-compose
-variables:
-  - name: UserBaseURL
-    value: http://localhost:8080/
-  - name: PaymentBaseURL
-    value: http://localhost:8082/
-  - name: CatalogBaseURL
-    value: http://localhost:8081/

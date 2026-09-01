@@ -1,0 +1,25 @@
+info:
+  name: GetGame
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseURL}}api/game?id={{GameId}}"
+  params:
+    - name: id
+      value: "{{GameId}}"
+      type: query
+  auth: inherit
+
+runtime:
+  variables:
+    - name: GameId
+      value: ad079687-6caa-412d-8c14-2cfca51df4a0
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

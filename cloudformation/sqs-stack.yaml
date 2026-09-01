@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Template CloudFormation FGC - SQS"  
+
+Resources:
+  UserCreatedQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "user-created-queue"
+      VisibilityTimeout: 30
+      
+  PaymentProcessedQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: "payment-processed-queue"
+      VisibilityTimeout: 30
+
+Outputs:
+  UserCreatedQueueUrl:
+    Description: "URL da fila de usuarios criados"
+    Value: !Ref UserCreatedQueue
+    Export:
+      Name: "UserCreatedQueue-Url"
+    
+  PaymentProcessedQueueUrl:
+    Description: "URL da fila de pagamentos processados"
+    Value: !Ref PaymentProcessedQueue
+    Export:
+      Name: "PaymentProcessedQueue-Url"

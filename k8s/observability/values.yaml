@@ -1,0 +1,13 @@
+grafana:
+  enabled: true
+  adminPassword: "admin"
+  service:
+    type: ClusterIP # Ou LoadBalancer / NodePort dependendo de como você acessa o cluster
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi

@@ -1,0 +1,147 @@
+_format_version: "3.0"
+certificates:
+  - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+    cert: |
+      -----BEGIN CERTIFICATE-----
+      MIIC6DCCAdCgAwIBAgIUdomPRHmSelmfygB+agB+YZHIl2EwDQYJKoZIhvcNAQEL
+      BQAwFDESMBAGA1UEAwwJZmdjLmxvY2FsMB4XDTI2MDgyNjAzMTkwMVoXDTI3MDgy
+      NjAzMTkwMVowFDESMBAGA1UEAwwJZmdjLmxvY2FsMIIBIjANBgkqhkiG9w0BAQEF
+      AAOCAQ8AMIIBCgKCAQEAw0HM8E/5kYPUZApaqGstRKjcj4NKggvxTjlvFguwauf7
+      7VJ1/SoJph4ZI+dxq6gS8GQ2Hi99kc5r5fTDCgdKPnX4DbBdzYF1EMFVk0VSubzQ
+      nkS67OwV1HllpGlX/HZoc/0GRds9CgVD7mcyiGDicpR7rbkKQi/rASLdCKNZIM96
+      kyRPw61vFao/Ue/lfw3Jj5WqxmODI79njh6gE2vDFTN3vka5pxgukdyKyhRJ7ngt
+      UFfsjlWX95Dzr44xaPuRjaW2ZuM/NQVnczl5Ag5ReI9uNEy+N6EV+RJaczarGmdW
+      +0/P3YZlAsz3ZV/sNxl+J/BFSY6jpav4M7VQZLVzwQIDAQABozIwMDAdBgNVHQ4E
+      FgQU+9kb8RNRJJdXGkyt4uEuPv9rA/MwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG
+      9w0BAQsFAAOCAQEAI3FD5K+HARaWiVb7K9ONSr4Zrqd7bhmWRSu87JgU1AQk0CyU
+      N3dhwodAdFTVUYUhFPtqmWcYDaWgB3a9UrBmdiMyB/60siNH/BHDFP1PkEOckNo4
+      nnFrrE9HDKSEffZlaFQMzA2BxEyYKn6ApiTq9Brmd7cvqD6myjxApfxMwE2HW9VP
+      ziWbRE5pB2yaG3LyfjQk3PpsNx4KWupfIkbkxt/ufaGAbtK2eKN+doAGDBR01W8q
+      dR+Z1j+Giyuk8wlmWtEousG/nGw/6OWSyRs/z7vNg5x00eecnw1dTNIO5HrNTzjR
+      aYvUgxa2vsMM4G2Itp3GREPn6hSZe2epVyS3cg==
+      -----END CERTIFICATE-----
+
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDDQczwT/mRg9Rk
+      Clqoay1EqNyPg0qCC/FOOW8WC7Bq5/vtUnX9KgmmHhkj53GrqBLwZDYeL32Rzmvl
+      9MMKB0o+dfgNsF3NgXUQwVWTRVK5vNCeRLrs7BXUeWWkaVf8dmhz/QZF2z0KBUPu
+      ZzKIYOJylHutuQpCL+sBIt0Io1kgz3qTJE/DrW8Vqj9R7+V/DcmPlarGY4Mjv2eO
+      HqATa8MVM3e+RrmnGC6R3IrKFEnueC1QV+yOVZf3kPOvjjFo+5GNpbZm4z81BWdz
+      OXkCDlF4j240TL43oRX5ElpzNqsaZ1b7T8/dhmUCzPdlX+w3GX4n8EVJjqOlq/gz
+      tVBktXPBAgMBAAECggEAAf8wJfrnzKf+Trwa335O5xT6TxCEcGyuffKHkYa5OgZC
+      xnnTIyDJ2rkT033MUcYdIUUUsLQWYTytA1vm+AX2HMoQaUgG+434TFcX0l+q/nAh
+      HfJwvj4vWBFAqHqB0Xi4bbHWNxxsZQ5dYQJAUZ8t1BNmUBlhRecPMyw/7UgDYAFV
+      ALK2PhEPYZ+gwCKqYXFBj/TtDtWYABA9MFBRiFGxpQAnvL+Wxw8TN5j+GGu9ojD9
+      7J7PbGbhgHOfs7RYGOChPMWHPvPrI1I3YtKd+946bDdAdjZtk1dpEwGZHOpHucil
+      79FUzjOMzPihTcP7hVazw/K8Duhf6mFPfjhwxKsfGQKBgQDwr9+V7q2YZJzWt/9O
+      sYiMYEerIZfszW9kvp885aZBj3aj14PfU/ggyYEF6mqwKMwk5B2jLgIqiNpwJmnj
+      wzsGM8vLlHNJMrSAt8dqmXZlnjZ9Tprx9L8NLTR3ZAmWUK4L7QlbB+jle2arU9hI
+      /7YprPDA+imCvhb6P4zGx7Kq2QKBgQDPrf+VwSLsLHNzLTLmphaJByB2lR/pPTZV
+      MtLqC2T6p2rJfdhu6wLXyxW1b1ev+I8B5Wa4e/MYbwSuSRQvFRLv8J/crXU+v3sO
+      ukxm5ULQdYKEOUf2AI+LOF+X+s+F9TEAZTZWm9xPmB4lCKA2YMFRznw7+qnYEoOY
+      KKVnrqRvKQKBgQDneP0agLTK/tgnWEVdNTgRaPcECgbGYrxis0EJnALMwmBjKf1V
+      ZrgXMDO5sLxyNoo+YHRwXusOZRdPDGKB/VxilqXEYDyPhQg7UoOibXyENihJUrOJ
+      RswGrBbtS3Q879Ky/YAl3/GH4anX04cKjYJvijbwIKaTaqVGfp+w/JVD4QKBgHh8
+      BKxXyS/lNfFbBo3DS42hwdap+0JwTcYt3ykDBUlZuV0+EkN/Oj4BRw3kk6W2eRjr
+      gqWC22yQc9G8+eW6vyrOmaAITd3ibr0DnfGQDiwsEFUvei0g9CYbxXHBg4W+0vfc
+      wCKM98qBgPORRollpqIUPgT6DnEZhJjQ8+zr59/JAoGBALmQWQq3jCWlBTrHW9Xj
+      6a5/8+JgyD6DW11YVcNhewIf4qMXuo6WM4OtgdDXoBsM/2FcBQ/15gXoYlhhMxSu
+      hkGpHh+zt+nh+z7VbrNB+oq+mN6337GEACPbHNNpo6uOu5g7tP8FfCNeiSqFObdw
+      QcMhF3V82n3gWofzPHMGGnUQ
+      -----END PRIVATE KEY-----
+
+snis:
+  - id: f9e8d7c6-b5a4-3210-fedc-ba9876543210
+    name: fgc.local
+    certificate:
+      id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+consumers:
+  - username: fgc-api-client
+    jwt_secrets:
+      - key: fgcapi
+        secret: 8594df0eb5ecb4c96f8824462cc7d2e1885c138908f2f7b4357af54b72ab2ed6
+        algorithm: HS256
+
+services:
+  - name: catalog-service
+    url: http://catalog-api-service.fgc.svc.cluster.local:80
+    routes:
+      - name: catalog-game-route
+        paths:
+          - /api/game
+        strip_path: false
+        protocols: [https]
+      - name: catalog-library-route
+        paths:
+          - /api/library
+        strip_path: false
+        protocols: [https]
+        plugins:
+          - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
+      - name: catalog-order-route
+        paths:
+          - /api/order
+        strip_path: false
+        protocols: [https]
+        plugins:
+          - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
+
+  - name: users-service
+    url: http://users-api-service.fgc.svc.cluster.local:80
+    routes:
+      - name: user-role-route
+        paths:
+          - /api/user/role
+        strip_path: false
+        protocols: [https]
+        plugins:
+          - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
+      - name: user-register-get-route
+        paths:
+          - /api/user
+        strip_path: false
+        protocols: [https]
+        
+  - name: auth-service
+    url: http://users-api-service.fgc.svc.cluster.local:80
+    routes:
+      - name: auth-login-route
+        paths:
+          - /api/auth/login
+        strip_path: false
+        protocols: [https]
+
+  - name: payment-service
+    url: http://payment-api-service.fgc.svc.cluster.local:80
+    routes:
+      - name: payment-approve-route
+        paths:
+          - /api/payment/approve
+        strip_path: false
+        protocols: [https]
+        plugins:
+          - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
+      - name: payment-decline-route
+        paths:
+          - /api/payment/decline
+        strip_path: false
+        protocols: [https]
+        plugins:
+          - name: jwt
+            config:
+              header_names: [authorization]
+              claims_to_verify: [exp]
