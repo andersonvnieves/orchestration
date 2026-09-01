@@ -123,7 +123,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum by(app, code) (increase(http_requests_received_total{job=\"kubernetes-pods\", app=~\"$app\"}[$__rate_interval]))",
+          "expr": "sum by(app) (increase(http_requests_received_total{job=\"kubernetes-pods\", app=~\"$app\"}[$__rate_interval]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
