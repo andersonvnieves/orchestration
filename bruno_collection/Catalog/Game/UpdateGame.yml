@@ -1,0 +1,41 @@
+info:
+  name: UpdateGame
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: "{{baseURL}}api/game"
+  body:
+    type: json
+    data: |-
+      {
+        "id": "{{GameId}}",
+        "title": "Horizon Zero Dawn wild lands",
+        "description": "strin g",
+        "story": "string sssss",
+        "price": 100,
+        "franchise": "Horizon Zero Dawn",
+        "releaseDate": "2026-06-26",
+        "ageRating": "A16",
+        "gameModes": [
+          "SinglePlayer"
+        ],
+        "publisher": "Playstatin Studios",
+        "developers": [
+          "Guerrilla"
+        ]
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: GameId
+      value: ad079687-6caa-412d-8c14-2cfca51df4a0
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

@@ -1,0 +1,10 @@
+name: k8s-kong-local
+variables:
+  - name: baseURL
+    value: https://localhost:30443/
+  - name: GameId
+    value: ad079687-6caa-412d-8c14-2cfca51df4a0
+  - name: OrderId
+    value: a3bf5217-d4a8-48c7-b7b1-c3c233be6ce2
+  - name: accessToken
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4MmNiN2U1Yy1lNWY5LTRlN2ItOGUyMC1mNmM2OTE4OWY1YTgiLCJuYW1lIjoiRmlyc3ROYW1lIExhc3ROYW1lIiwiZW1haWwiOiJhZG1pbkBmZ2MuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJleHAiOjE3ODc5NjE0NTIsImlzcyI6ImZnY2FwaSIsImF1ZCI6ImZnY2FwaSJ9.nCIaxkeToywHdyqImN6zlSadHZ1CyNN8r9ywJOVQrHY
