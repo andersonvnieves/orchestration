@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Template CloudFormation FGC - ECR'
+
+Resources:
+  FgcCatalogServiceRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: 'fgc-catalog-service'
+      ImageTagMutability: 'MUTABLE'
+      EncryptionConfiguration:
+        EncryptionType: 'AES256'
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+  FgcPaymentServiceRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: 'fgc-payment-service'
+      ImageTagMutability: 'MUTABLE'
+      EncryptionConfiguration:
+        EncryptionType: 'AES256'
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+  FgcUserServiceRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: 'fgc-user-service'
+      ImageTagMutability: 'MUTABLE'
+      EncryptionConfiguration:
+        EncryptionType: 'AES256'
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+Outputs:
+  CatalogServiceRepositoryUri:
+    Description: 'URI do repositório ECR do Catalog Service'
+    Value: !GetAtt FgcCatalogServiceRepository.RepositoryUri
+    Export:
+      Name: 'FgcCatalogServiceRepositoryUri'
+
+  PaymentServiceRepositoryUri:
+    Description: 'URI do repositório ECR do Payment Service'
+    Value: !GetAtt FgcPaymentServiceRepository.RepositoryUri
+    Export:
+      Name: 'FgcPaymentServiceRepositoryUri'
+
+  UserServiceRepositoryUri:
+    Description: 'URI do repositório ECR do User Service'
+    Value: !GetAtt FgcUserServiceRepository.RepositoryUri
+    Export:
+      Name: 'FgcUserServiceRepositoryUri'

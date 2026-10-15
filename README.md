@@ -116,6 +116,392 @@ Na pasta cloudformation temos o arquivo sqs-stack.yaml responsável por criar as
 aws cloudformation deploy --template-file .\cloudformation\sqs-stack.yaml --stack-name sqs-stack --capabilities CAPABILITY_IAM
 ```
 
+## Parâmetros e Segredos do AWS Systems Manager (Parameter Store)
+
+Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, divididos por categoria, com suas respectivas descrições, tipos e o comando de exemplo para criação/atualização via AWS CLI.
+
+### 1. JWT & Autenticação
+
+* **`/fgc/jwt/secret`**
+  * **Descrição:** Segredo JWT utilizado pelo Kong e pelos microsserviços.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/jwt/secret' --type 'SecureString' --value 'SEU_SEGREDO_JWT' --description 'Segredo JWT utilizado pelo Kong e pelos microsserviços' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/jwt/issuer`**
+  * **Descrição:** Issuer JWT para os tokens.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/jwt/issuer' --type 'String' --value 'fgcapi' --description 'Issuer JWT para os tokens' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/jwt/audience`**
+  * **Descrição:** Audience JWT para os tokens.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/jwt/audience' --type 'String' --value 'fgcapi' --description 'Audience JWT para os tokens' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/jwt/token-ttl`**
+  * **Descrição:** Tempo de vida do token JWT em minutos.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/jwt/token-ttl' --type 'String' --value '10' --description 'Tempo de vida do token JWT em minutos' --tier 'Standard' --overwrite
+    ```
+
+### 2. Kong API Gateway
+
+* **`/fgc/kong/ssl-cert`**
+  * **Descrição:** Certificado SSL utilizado pelo Kong API Gateway.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/kong/ssl-cert' --type 'String' --value '-----BEGIN CERTIFICATE-----\n...' --description 'Certificado SSL utilizado pelo Kong API Gateway' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/kong/ssl-key`**
+  * **Descrição:** Chave privada SSL utilizada pelo Kong API Gateway.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/kong/ssl-key' --type 'SecureString' --value '-----BEGIN PRIVATE KEY-----\n...' --description 'Chave privada SSL utilizada pelo Kong API Gateway' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+### 3. Observabilidade (Grafana, Prometheus, Loki)
+
+* **`/fgc/grafana/admin-user`**
+  * **Descrição:** Usuário administrador do Grafana.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/grafana/admin-user' --type 'SecureString' --value 'admin' --description 'Usuário administrador do Grafana' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/grafana/admin-password`**
+  * **Descrição:** Senha do administrador do Grafana.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/grafana/admin-password' --type 'SecureString' --value 'admin' --description 'Senha do administrador do Grafana' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/observability/prometheus-url`**
+  * **Descrição:** URL interna do serviço Prometheus.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/observability/prometheus-url' --type 'String' --value '[http://prometheus-service.observability.svc.cluster.local:9090](http://prometheus-service.observability.svc.cluster.local:9090)' --description 'URL interna do serviço Prometheus' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/observability/loki-url`**
+  * **Descrição:** URL interna do serviço Loki.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/observability/loki-url' --type 'String' --value '[http://loki-service.observability.svc.cluster.local:3100](http://loki-service.observability.svc.cluster.local:3100)' --description 'URL interna do serviço Loki' --tier 'Standard' --overwrite
+    ```
+
+### 4. Mensageria & Infraestrutura
+
+* **`/fgc/rabbitmq/default-user`**
+  * **Descrição:** Usuário padrão do RabbitMQ.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/rabbitmq/default-user' --type 'String' --value 'admin' --description 'Usuário padrão do RabbitMQ' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/rabbitmq/default-pass`**
+  * **Descrição:** Senha padrão do RabbitMQ.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/rabbitmq/default-pass' --type 'SecureString' --value 'admin123' --description 'Senha padrão do RabbitMQ' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/aws/region`**
+  * **Descrição:** Região AWS da aplicação.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/aws/region' --type 'String' --value 'sa-east-1' --description 'Região AWS da aplicação' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/aws/access-key-id`**
+  * **Descrição:** AWS Access Key ID para serviços AWS.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/aws/access-key-id' --type 'SecureString' --value 'CHANGE_ME' --description 'AWS Access Key ID para serviços AWS' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/aws/secret-access-key`**
+  * **Descrição:** AWS Secret Access Key para serviços AWS.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/aws/secret-access-key' --type 'SecureString' --value 'CHANGE_ME' --description 'AWS Secret Access Key para serviços AWS' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/sqs/user-created-queue-url`**
+  * **Descrição:** URL da fila SQS `user-created-queue`.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/sqs/user-created-queue-url' --type 'String' --value 'CHANGE_ME' --description 'URL da fila SQS user-created-queue' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/sqs/payment-processed-queue-url`**
+  * **Descrição:** URL da fila SQS `payment-processed-queue`.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/sqs/payment-processed-queue-url' --type 'String' --value 'CHANGE_ME' --description 'URL da fila SQS payment-processed-queue' --tier 'Standard' --overwrite
+    ```
+
+### 5. User Service
+
+* **`/fgc/users/sql-password`**
+  * **Descrição:** Senha SA do SQL Server do User Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/users/sql-password' --type 'SecureString' --value 'rohPav-juKmeb-DIhku9!' --description 'Senha SA do SQL Server do User Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/users/connection-string`**
+  * **Descrição:** Connection string do banco de dados do User Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/users/connection-string' --type 'SecureString' --value 'Server=users-db-service;Database=FGC_User;User Id=sa;Password=rohPav-juKmeb-DIhku9!;TrustServerCertificate=True' --description 'Connection string do banco de dados do User Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/users/root-password`**
+  * **Descrição:** Senha inicial do usuário root do User Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/users/root-password' --type 'SecureString' --value 'Admin@123' --description 'Senha inicial do usuario root do User Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/users/root-first-name`**
+  * **Descrição:** Nome do usuário root inicial.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/users/root-first-name' --type 'String' --value 'FirstName' --description 'Nome do usuario root inicial' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/users/root-last-name`**
+  * **Descrição:** Sobrenome do usuário root inicial.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/users/root-last-name' --type 'String' --value 'LastName' --description 'Sobrenome do usuario root inicial' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/users/root-email`**
+  * **Descrição:** E-mail do usuário root inicial.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/users/root-email' --type 'String' --value 'admin@fgc.com' --description 'E-mail do usuario root inicial' --tier 'Standard' --overwrite
+    ```
+
+### 6. Catalog Service
+
+* **`/fgc/catalog/sql-password`**
+  * **Descrição:** Senha SA do SQL Server do Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/sql-password' --type 'SecureString' --value 'rohPav-juKmeb-DIhku9!' --description 'Senha SA do SQL Server do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/connection-string`**
+  * **Descrição:** Connection string do banco de dados SQL do Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/connection-string' --type 'SecureString' --value 'Server=catalog-db-service;Database=FGC_Catalog;User Id=sa;Password=rohPav-juKmeb-DIhku9!;TrustServerCertificate=True' --description 'Connection string do banco de dados SQL do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/rabbitmq-uri`**
+  * **Descrição:** URI de conexão com RabbitMQ para o Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/rabbitmq-uri' --type 'SecureString' --value 'amqp://admin:admin123@rabbitmq-service:5672/' --description 'URI de conexao com RabbitMQ para o Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/mongo-user`**
+  * **Descrição:** Usuário root do MongoDB do Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/mongo-user' --type 'SecureString' --value 'mongoadmin' --description 'Usuario root do MongoDB do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/mongo-password`**
+  * **Descrição:** Senha root do MongoDB do Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/mongo-password' --type 'SecureString' --value 'zessuq-8gyzda-jazhyN' --description 'Senha root do MongoDB do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/mongodb-uri`**
+  * **Descrição:** URI de conexão com MongoDB para o Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/mongodb-uri' --type 'SecureString' --value 'mongodb://mongoadmin:zessuq-8gyzda-jazhyN@mongodb-service:27017/catalog_service?authSource=admin&guidRepresentation=Standard' --description 'URI de conexao com MongoDB para o Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/mongodb-dbname`**
+  * **Descrição:** Nome da base MongoDB do Catalog Service.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/mongodb-dbname' --type 'String' --value 'catalog_service' --description 'Nome da base MongoDB do Catalog Service' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/redis-connection`**
+  * **Descrição:** Connection string do Redis para o Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/redis-connection' --type 'SecureString' --value 'redis-service:6379,password=datgef-6zadci-nyZbud' --description 'Connection string do Redis para o Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/redis-password`**
+  * **Descrição:** Senha do Redis do Catalog Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/redis-password' --type 'SecureString' --value 'datgef-6zadci-nyZbud' --description 'Senha do Redis do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/order-created-exchange`**
+  * **Descrição:** Exchange RabbitMQ para evento Order Created[span_20](start_span)[span_20](end_span).
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/order-created-exchange' --type 'String' --value 'fgc' --description 'Exchange RabbitMQ para evento Order Created' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/order-created-routing-key`**
+  * **Descrição:** Routing Key RabbitMQ para evento Order Created.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/order-created-routing-key' --type 'String' --value 'order.created' --description 'Routing Key RabbitMQ para evento Order Created' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/order-created-queue-name`**
+  * **Descrição:** Nome da fila RabbitMQ para evento Order Created.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/order-created-queue-name' --type 'String' --value 'order.created' --description 'Nome da fila RabbitMQ para evento Order Created' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/payment-processed-exchange`**
+  * **Descrição:** Exchange RabbitMQ para evento Payment Processed.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/payment-processed-exchange' --type 'String' --value 'fgc' --description 'Exchange RabbitMQ para evento Payment Processed' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/payment-processed-routing-key`**
+  * **Descrição:** Routing Key RabbitMQ para evento Payment Processed.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/payment-processed-routing-key' --type 'String' --value 'payment.processed' --description 'Routing Key RabbitMQ para evento Payment Processed' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/payment-processed-queue-name`**
+  * **Descrição:** Nome da fila RabbitMQ para evento Payment Processed.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/payment-processed-queue-name' --type 'String' --value 'catalog.payment.processed' --description 'Nome da fila RabbitMQ para evento Payment Processed' --tier 'Standard' --overwrite
+    ```
+
+### 7. Payment Service
+
+* **`/fgc/payment/sql-password`**
+  * **Descrição:** Senha SA do SQL Server do Payment Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/sql-password' --type 'SecureString' --value 'rohPav-juKmeb-DIhku9!' --description 'Senha SA do SQL Server do Payment Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/payment/connection-string`**
+  * **Descrição:** Connection string do banco de dados SQL do Payment Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/connection-string' --type 'SecureString' --value 'Server=payment-db-service;Database=FGC_Payment;User Id=sa;Password=rohPav-juKmeb-DIhku9!;TrustServerCertificate=True' --description 'Connection string do banco de dados SQL do Payment Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/payment/rabbitmq-uri`**
+  * **Descrição:** URI de conexão com RabbitMQ para o Payment Service.
+  * **Tipo:** `SecureString` (Segredo)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/rabbitmq-uri' --type 'SecureString' --value 'amqp://admin:admin123@rabbitmq-service:5672/' --description 'URI de conexao com RabbitMQ para o Payment Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/payment/order-created-exchange`**
+  * **Descrição:** Exchange RabbitMQ Order Created no Payment Service.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/order-created-exchange' --type 'String' --value 'fgc' --description 'Exchange RabbitMQ Order Created no Payment Service' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/payment/order-created-routing-key`**
+  * **Descrição:** Routing Key RabbitMQ Order Created no Payment Service.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/order-created-routing-key' --type 'String' --value 'order.created' --description 'Routing Key RabbitMQ Order Created no Payment Service' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/payment/payment-processed-exchange`**
+  * **Descrição:** Exchange RabbitMQ Payment Processed no Payment Service.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/payment-processed-exchange' --type 'String' --value 'fgc' --description 'Exchange RabbitMQ Payment Processed no Payment Service' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/payment/payment-processed-routing-key`**
+  * **Descrição:** Routing Key RabbitMQ Payment Processed no Payment Service.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/payment/payment-processed-routing-key' --type 'String' --value 'payment.processed' --description 'Routing Key RabbitMQ Payment Processed no Payment Service' --tier 'Standard' --overwrite
+    ```
+
+### Sincronizar com o Kubernetes via External Secrets Operator
+
+Para integrar os valores salvos no AWS Parameter Store com o Kubernetes, aplique a stack do External Secrets Operator:
+
+```bash
+kubectl apply -f .\k8s\external-secrets-stack.yaml
+```
+
 ### Deploy Notifications Lambda
 
 Vá para a pasta do projeto da lambda e execute o comando de deploy da lambda:

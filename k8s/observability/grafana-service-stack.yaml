@@ -1,18 +1,23 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: observability
----
-apiVersion: v1
-kind: Secret
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
 metadata:
   name: grafana-admin-credentials
   namespace: observability
-type: Opaque
-data:
-  # Valores codificados em Base64 (admin / admin)
-  admin-user: "YWRtaW4="
-  admin-password: "YWRtaW4="
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: aws-parameter-store
+    kind: SecretStore
+  target:
+    name: grafana-admin-credentials
+    creationPolicy: Owner
+  data:
+    - secretKey: admin-user
+      remoteRef:
+        key: /fgc/grafana/admin-user
+    - secretKey: admin-password
+      remoteRef:
+        key: /fgc/grafana/admin-password
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -104,4 +109,4 @@ spec:
     - protocol: TCP
       port: 3000
       targetPort: 3000
-  type: ClusterIP
+  type: LoadBalancer
