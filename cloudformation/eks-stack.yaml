@@ -19,6 +19,7 @@ Resources:
     Type: AWS::EKS::Cluster
     Properties:
       Name: "fgc-cluster"
+      Version: "1.32" 
       RoleArn: !Ref ClusterRoleArn
       ResourcesVpcConfig:
         SubnetIds: !Ref SubnetIds

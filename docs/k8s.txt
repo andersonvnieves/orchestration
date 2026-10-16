@@ -6,7 +6,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt
 aws cloudformation deploy --template-file cloudformation/ecr-stack.yaml --stack-name tc04-ecr --capabilities CAPABILITY_IAM
 aws cloudformation deploy --template-file cloudformation/sqs-stack.yaml --stack-name tc04-sqs --capabilities CAPABILITY_IAM
 
-aws cloudformation deploy --template-file cloudformation/eks-stack.yaml --stack-name fgc-eks-cluster --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn="arn:aws:iam::230287251097:role/fgc-eks-cluster" NodeRoleArn="arn:aws:iam::230287251097:instance-profile/fgc-node-role" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5"
+aws cloudformation deploy --template-file cloudformation/eks-stack.yaml --stack-name tc04-eks --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn="arn:aws:iam::230287251097:role/fgc-eks-cluster" NodeRoleArn="arn:aws:iam::230287251097:role/fgc-node-role" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5"
 
 =========================================================================================================
 #Deploy secrets amd parameters
@@ -85,6 +85,12 @@ kubectl port-forward svc/rabbitmq-service -n fgc 15672:15672
 =========================================================================================================
 #Delete Stack
 =========================================================================================================
+aws cloudformation delete-stack --stack-name tc04-ecr --region sa-east-1
+aws cloudformation delete-stack --stack-name tc04-sqs --region sa-east-1
+aws cloudformation delete-stack --stack-name tc04-eks --region sa-east-1
+
+
+
 kubectl delete -f  k8s\observability\local\prometheus-service-stack.yaml 
 kubectl delete -f  k8s\observability\local\loki-service-stack.yaml
 kubectl delete -f  k8s\observability\base\promtail-daemon-stack.yaml
