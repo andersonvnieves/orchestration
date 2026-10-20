@@ -39,8 +39,8 @@ Resources:
         MinSize: 2
         DesiredSize: 2
         MaxSize: 3
-      DiskSize: 15
-      AmiType: AL2023_x86_64
+      DiskSize: 25
+      AmiType: AL2023_x86_64_STANDARD
 
 Outputs:
   ClusterEndpoint:

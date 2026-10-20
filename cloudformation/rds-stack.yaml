@@ -14,7 +14,6 @@ Parameters:
 
 
 Resources:
-  # DB subnet group shared by all instances
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -24,7 +23,6 @@ Resources:
         - Key: Name
           Value: fgc-rds-subnet-group
 
-  # Security group rules (allow inbound from the provided SG on default SQL Server port 1433)
   DBSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -34,7 +32,6 @@ Resources:
       ToPort: 1433
       SourceSecurityGroupId: !Ref SecurityGroupId
 
-  # Helper secret to store DB credentials (optional but recommended)
   DBSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -46,7 +43,6 @@ Resources:
           "password": "${DBPassword}"
         }
 
-  # Catalog database instance
   CatalogDBInstance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -69,7 +65,6 @@ Resources:
         - Key: Name
           Value: catalog-db
 
-  # User database instance
   UserDBInstance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -92,7 +87,6 @@ Resources:
         - Key: Name
           Value: user-db
 
-  # Payment database instance
   PaymentDBInstance:
     Type: AWS::RDS::DBInstance
     Properties:

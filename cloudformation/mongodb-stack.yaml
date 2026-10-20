@@ -14,7 +14,6 @@ Parameters:
 
 
 Resources:
-  # Subnet group for DocumentDB
   DocDBSubnetGroup:
     Type: AWS::DocDB::DBSubnetGroup
     Properties:
@@ -24,7 +23,6 @@ Resources:
         - Key: Name
           Value: fgc-docdb-catalog-subnet-group
 
-  # DocumentDB cluster (single-instance, cheapest configuration)
   DocDBCluster:
     Type: AWS::DocDB::DBCluster
     Properties:
@@ -44,7 +42,6 @@ Resources:
         - Key: Name
           Value: fgc-catalog-docdb-cluster
 
-  # Single instance for the cluster
   DocDBInstance:
     Type: AWS::DocDB::DBInstance
     Properties:

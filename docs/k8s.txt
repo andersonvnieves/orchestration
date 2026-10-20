@@ -38,6 +38,10 @@ helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver 
 
 aws eks create-addon --cluster-name fgc-cluster --addon-name aws-ebs-csi-driver   --region sa-east-1
 
+
+kubectl rollout restart deployment ebs-csi-controller -n kube-system
+
+
 =========================================================================================================
 #Apply External Secrests on EKS cluster
 =========================================================================================================
