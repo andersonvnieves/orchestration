@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Managed Redis cache'
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the cache
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs for the cache subnet group
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: SG allowing inbound on port 6379
+
+Resources:
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Subnet group for Redis cache
+      SubnetIds: !Ref SubnetIds
+
+  RedisCache:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      Engine: redis
+      EngineVersion: "7.0"
+      CacheNodeType: cache.t3.micro
+      NumCacheNodes: 1
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref SecurityGroupId
+      Port: 6379
+      AutoMinorVersionUpgrade: true
+
+Outputs:
+  RedisEndpoint:
+    Description: Endpoint of Redis
+    Value: !GetAtt RedisCache.RedisEndpoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-RedisEndpoint"

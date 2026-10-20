@@ -25,10 +25,18 @@ aws eks update-kubeconfig --region sa-east-1 --name fgc-cluster
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
 
+helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace --set installCRDs=true
+
 =========================================================================================================
-#Install Operator on namespace 'external-secrets'
+#Add EBS Driver with Helm
 =========================================================================================================
-helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace
+
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+
+helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver --namespace kube-system
+
+aws eks create-addon --cluster-name fgc-cluster --addon-name aws-ebs-csi-driver   --region sa-east-1
 
 =========================================================================================================
 #Apply External Secrests on EKS cluster
@@ -50,16 +58,6 @@ docker build -t fgc-user-service:latest -f ../user-service/Dockerfile ../user-se
 =========================================================================================================
 #Apply Stack
 =========================================================================================================
-kubectl apply -f  k8s\observability\local\prometheus-service-stack.yaml 
-kubectl apply -f  k8s\observability\local\loki-service-stack.yaml
-kubectl apply -f  k8s\observability\base\promtail-daemon-stack.yaml
-kubectl apply -f  k8s\observability\local\grafana-service-stack.yaml
-
-kubectl apply -f ..\user-service\k8s\user-service-stack.yml
-kubectl apply -f ..\catalog-service\k8s\catalog-service-stack.yml
-kubectl apply -f ..\payment-service\k8s\payment-service-stack.yml
-kubectl apply -f .\k8s\api-gateway\local\kong-service-stack.yml
-
 macOS
 
 kubectl apply -f k8s/external-secrets-stack.yaml

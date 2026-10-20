@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Managed Amazon MQ (RabbitMQ engine)'
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC where the RabbitMQ broker will be deployed
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs (at least two) for the broker's subnet group
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: SG allowing inbound on RabbitMQ ports (5672, 15672)
+
+Resources:
+  RabbitMQSubnetGroup:
+    Type: AWS::AmazonMQ::Configuration
+    Properties:
+      EngineType: RabbitMQ
+      Name: fgc-rabbitmq-config
+      EngineVersion: "3.13.0"
+
+  RabbitMQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties:
+      BrokerName: fgc-rabbitmq-broker
+      EngineType: RabbitMQ
+      EngineVersion: "3.13.0"
+      HostInstanceType: mq.t3.micro
+      DeploymentMode: SINGLE_INSTANCE
+      PubliclyAccessible: false
+      SubnetIds: !Ref SubnetIds
+      SecurityGroups:
+        - !Ref SecurityGroupId
+      Users:
+        - Username: {{resolve:ssm:/fgc/rabbitmq/default-user:1}}
+          Password: {{resolve:ssm-secure:/fgc/rabbitmq/default-pass:1}}
+      Configuration:
+        Id: !Ref RabbitMQSubnetGroup
+        Revision: 1
+
+Outputs:
+  RabbitMQBrokerId:
+    Description: ID of the Amazon MQ RabbitMQ broker
+    Value: !Ref RabbitMQBroker
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQBrokerId"
+  RabbitMQEndpoints:
+    Description: Endpoints (AMQP) for the broker
+    Value: !GetAtt RabbitMQBroker.AmqpEndpoints
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQEndpoints"
+  RabbitMQConsoleUrl:
+    Description: URL for the RabbitMQ Management Console (Web UI)
+    Value: !GetAtt RabbitMQBroker.ConsoleUrl
+    Export:
+      Name: !Sub "${AWS::StackName}-RabbitMQConsoleUrl"
