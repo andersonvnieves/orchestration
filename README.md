@@ -332,14 +332,6 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
     aws ssm put-parameter --name '/fgc/catalog/redis-connection' --type 'SecureString' --value 'redis-service:6379,password=datgef-6zadci-nyZbud' --description 'Connection string do Redis para o Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
     ```
 
-* **`/fgc/catalog/redis-password`**
-  * **Descrição:** Senha do Redis do Catalog Service.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/catalog/redis-password' --type 'SecureString' --value 'datgef-6zadci-nyZbud' --description 'Senha do Redis do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
-
 * **`/fgc/catalog/order-created-exchange`**
   * **Descrição:** Exchange RabbitMQ para evento Order Created[span_20](start_span)[span_20](end_span).
   * **Tipo:** `String` (Parâmetro)
@@ -386,6 +378,22 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
   * **Exemplo AWS CLI:**
     ```bash
     aws ssm put-parameter --name '/fgc/catalog/payment-processed-queue-name' --type 'String' --value 'catalog.payment.processed' --description 'Nome da fila RabbitMQ para evento Payment Processed' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/elasticsearch-url`**
+  * **Descrição:** URL do Elasticsearch.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/elasticsearch-url' --type 'String' --value 'https://......' --description 'URL do Elasticsearch' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/elasticsearch-defaultindex`**
+  * **Descrição:** Default index do Elasticsearch.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/elasticsearch-defaultindex' --type 'String' --value 'catalog' --description 'Default index do Elasticsearch' --tier 'Standard' --overwrite
     ```
 
 ### 7. Payment Service

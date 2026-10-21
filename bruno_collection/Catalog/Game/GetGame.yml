@@ -15,7 +15,7 @@ http:
 runtime:
   variables:
     - name: GameId
-      value: ad079687-6caa-412d-8c14-2cfca51df4a0
+      value: d16043ae-97fb-4d3d-96fe-29a1e36b72d4
 
 settings:
   encodeUrl: true

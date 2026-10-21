@@ -55,6 +55,15 @@ Resources:
       DBClusterIdentifier: !Ref DocDBCluster
       AutoMinorVersionUpgrade: true
 
+  DocDBSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 27017
+      ToPort: 27017
+      CidrIp: 172.31.0.0/16
+
 Outputs:
   CatalogDocDBEndpoint:
     Description: Primary endpoint of the catalog DocumentDB cluster

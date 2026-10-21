@@ -6,8 +6,11 @@ Parameters:
     Type: AWS::EC2::VPC::Id
     Description: 'ID do VPC onde as instancias serao implantadas'
   SubnetId:
-    Type: List<AWS::EC2::Subnet::Id>
-    Description: 'ID da Subnet'
+    Type: AWS::EC2::Subnet::Id
+    Description: 'ID da Subnet (obrigatorio ser apenas uma para SINGLE_INSTANCE)'
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: 'Security group'
   RabbitUser:
     Type: String
     Description: Master username for RabbitMQ
@@ -22,28 +25,23 @@ Resources:
     Properties:
       BrokerName: fgc-rabbitmq-broker
       EngineType: RabbitMQ
-      EngineVersion: "4.3"
-      HostInstanceType: mq.m7g.large
+      EngineVersion: "3.13"
+      HostInstanceType: mq.m5.large
       DeploymentMode: SINGLE_INSTANCE
-      PubliclyAccessible: true
-      SubnetIds: !Ref SubnetId
+      PubliclyAccessible: false
+      SubnetIds:
+        - !Ref SubnetId
+      SecurityGroups:
+        - !Ref SecurityGroupId
       Users:
         - Username: !Ref RabbitUser
           Password: !Ref RabbitPassword
 
-Outputs:
-  RabbitMQBrokerId:
-    Description: ID of the Amazon MQ RabbitMQ broker
-    Value: !Ref RabbitMQBroker
-    Export:
-      Name: !Sub "${AWS::StackName}-RabbitMQBrokerId"
-  RabbitMQEndpoints:
-    Description: Endpoints (AMQP) for the broker
-    Value: !GetAtt RabbitMQBroker.AmqpEndpoints
-    Export:
-      Name: !Sub "${AWS::StackName}-RabbitMQEndpoints"
-  RabbitMQConsoleUrl:
-    Description: URL for the RabbitMQ Management Console (Web UI)
-    Value: !GetAtt RabbitMQBroker.ConsoleUrl
-    Export:
-      Name: !Sub "${AWS::StackName}-RabbitMQConsoleUrl"
+  RabbitMQSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 5671
+      ToPort: 5671
+      CidrIp: 172.31.0.0/16

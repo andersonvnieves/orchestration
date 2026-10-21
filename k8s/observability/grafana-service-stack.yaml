@@ -1,4 +1,9 @@
-apiVersion: external-secrets.io/v1beta1
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+---
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: grafana-admin-credentials
@@ -7,7 +12,7 @@ spec:
   refreshInterval: 1h
   secretStoreRef:
     name: aws-parameter-store
-    kind: SecretStore
+    kind: ClusterSecretStore   # Aponta para o ClusterSecretStore global
   target:
     name: grafana-admin-credentials
     creationPolicy: Owner
@@ -40,19 +45,6 @@ data:
         access: proxy
         url: http://loki-service.observability.svc.cluster.local:3100
         editable: false
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: grafana-pvc
-  namespace: observability
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: gp3
-  resources:
-    requests:
-      storage: 5Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -92,8 +84,7 @@ spec:
               mountPath: /etc/grafana/provisioning/datasources/
       volumes:
         - name: storage-volume
-          persistentVolumeClaim:
-            claimName: grafana-pvc
+          emptyDir: {}
         - name: datasource-volume
           configMap:
             name: grafana-datasources

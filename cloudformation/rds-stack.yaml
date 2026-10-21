@@ -33,7 +33,7 @@ Resources:
       IpProtocol: tcp
       FromPort: 1433
       ToPort: 1433
-      SourceSecurityGroupId: !Ref SecurityGroupId
+      CidrIp: 172.31.0.0/16
 
   FGCDBInstance:
     Type: AWS::RDS::DBInstance

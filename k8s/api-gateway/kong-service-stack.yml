@@ -1,4 +1,4 @@
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: kong-declarative-config
@@ -7,7 +7,7 @@ spec:
   refreshInterval: 1h
   secretStoreRef:
     name: aws-parameter-store
-    kind: SecretStore
+    kind: ClusterSecretStore
   target:
     name: kong-declarative-config
     creationPolicy: Owner
@@ -20,9 +20,9 @@ spec:
           certificates:
             - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
               cert: |
-                {{ .ssl_cert | indent 12 | trim }}
+                {{- .ssl_cert | replace "\\n" "\n" | nindent 16 }}
               key: |
-                {{ .ssl_key | indent 12 | trim }}
+                {{- .ssl_key | replace "\\n" "\n" | nindent 16 }}
 
           snis:
             - id: f9e8d7c6-b5a4-3210-fedc-ba9876543210
@@ -172,8 +172,8 @@ spec:
               mountPath: /etc/kong
       volumes:
         - name: config-volume
-          configMap:
-            name: kong-declarative-config
+          secret:
+            secretName: kong-declarative-config
 ---
 apiVersion: v1
 kind: Service
@@ -191,6 +191,3 @@ spec:
     - name: proxy-https
       port: 443
       targetPort: 8443
-    - name: admin
-      port: 9001
-      targetPort: 9001

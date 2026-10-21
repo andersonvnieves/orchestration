@@ -33,6 +33,15 @@ Resources:
       Port: 6379
       AutoMinorVersionUpgrade: true
 
+  RedisSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 6379
+      ToPort: 6379
+      CidrIp: 172.31.0.0/16
+
 Outputs:
   RedisEndpoint:
     Description: Endpoint of Redis

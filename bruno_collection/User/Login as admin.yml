@@ -16,6 +16,9 @@ http:
   auth: inherit
 
 runtime:
+  variables:
+    - name: baseURL
+      value: https://localhost:8443/
   scripts:
     - type: after-response
       code: |-

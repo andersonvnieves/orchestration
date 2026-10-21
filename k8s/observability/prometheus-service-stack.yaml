@@ -1,4 +1,9 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: prometheus
@@ -126,19 +131,6 @@ data:
             action: replace
             target_label: kubernetes_service_name
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: prometheus-pvc
-  namespace: observability
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: gp3
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -154,14 +146,14 @@ spec:
       labels:
         app: prometheus
     spec:
-      serviceAccountName: prometheus  # <-- vincula o RBAC ao pod
+      serviceAccountName: prometheus
       containers:
         - name: prometheus
           image: prom/prometheus:v2.45.0
           args:
             - "--config.file=/etc/prometheus/prometheus.yml"
             - "--storage.tsdb.path=/prometheus"
-            - "--web.enable-lifecycle"        # permite reload via API
+            - "--web.enable-lifecycle"
           ports:
             - containerPort: 9090
           volumeMounts:
@@ -174,8 +166,7 @@ spec:
           configMap:
             name: prometheus-config
         - name: storage-volume
-          persistentVolumeClaim:
-            claimName: prometheus-pvc
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

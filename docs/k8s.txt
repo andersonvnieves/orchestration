@@ -5,10 +5,14 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt
 =========================================================================================================
 aws cloudformation deploy --template-file cloudformation/ecr-stack.yaml --stack-name tc04-ecr --capabilities CAPABILITY_IAM
 aws cloudformation deploy --template-file cloudformation/sqs-stack.yaml --stack-name tc04-sqs --capabilities CAPABILITY_IAM
-aws cloudformation deploy --template-file cloudformation/rds-stack.yaml --stack-name tc04-rds --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" DBPassword="rohPav-juKmeb-DIhku9" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
-aws cloudformation deploy --template-file cloudformation/redis-stack.yaml --stack-name tc04-redis --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
-aws cloudformation deploy --template-file cloudformation/rabbitmq-stack.yml --stack-name tc04-rabbitmq --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0b6b4f48e357b2536" RabbitUser="admin" RabbitPassword="hnhU3z4zGHqB65F" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
-aws cloudformation deploy --template-file cloudformation/mongodb-stack.yaml --stack-name tc04-mongodb --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" MongoUsername="mongoadmin" MongoPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
+aws cloudformation deploy --template-file cloudformation/rds-stack.yaml --stack-name tc04-rds --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" DBPassword="rohPav-juKmeb-DIhku9" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+aws cloudformation deploy --template-file cloudformation/redis-stack.yaml --stack-name tc04-redis --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+aws cloudformation deploy --template-file cloudformation/rabbitmq-stack.yml --stack-name tc04-rabbitmq --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0b6b4f48e357b2536" SecurityGroupId="sg-00ad6a7b8ca81f960" RabbitUser="admin" RabbitPassword="hnhU3z4zGHqB65F" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+aws cloudformation deploy --template-file cloudformation/mongodb-stack.yaml --stack-name tc04-mongodb --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" MongoUsername="mongoadmin" MongoPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+
+aws iam create-service-linked-role --aws-service-name es.amazonaws.com
+aws cloudformation deploy --template-file cloudformation/elasticsearch-stack.yaml --stack-name tc04-elasticsearch --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" SearchUsername="searchadmin" SearchPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+
 aws cloudformation deploy --template-file cloudformation/eks-stack.yaml --stack-name tc04-eks --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn="arn:aws:iam::230287251097:role/fgc-eks-cluster" NodeRoleArn="arn:aws:iam::230287251097:role/fgc-node-role" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5"
 
 =========================================================================================================
@@ -27,11 +31,16 @@ aws eks update-kubeconfig --region sa-east-1 --name fgc-cluster
 =========================================================================================================
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
-helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace --set installCRDs=true
+helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace  --set webhook.enabled=true --set installCRDs=true
+
+helm upgrade --install external-secrets external-secrets/external-secrets --namespace external-secrets --create-namespace --set webhook.enabled=true
 
 =========================================================================================================
 # Apply External Secrests on EKS cluster
 =========================================================================================================
+eksctl utils associate-iam-oidc-provider --region=sa-east-1 --cluster=fgc-cluster --approve
+eksctl create iamserviceaccount --name external-secrets --namespace external-secrets --cluster fgc-cluster --attach-policy-arn arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess --approve --override-existing-serviceaccounts
+
 kubectl apply -f ./k8s/external-secrets-stack.yaml
 
 =========================================================================================================
@@ -44,25 +53,28 @@ docker build -t fgc-user-service:latest -f ../user-service/Dockerfile ../user-se
 =========================================================================================================
 # Apply Stack
 =========================================================================================================
-kubectl apply -f k8s/external-secrets-stack.yaml
+
 kubectl apply -f k8s/observability/prometheus-service-stack.yaml 
 kubectl apply -f k8s/observability/loki-service-stack.yaml
 kubectl apply -f k8s/observability/promtail-daemon-stack.yaml
 kubectl apply -f k8s/observability/grafana-service-stack.yaml
+
+kubectl get svc grafana-service -n observability
 
 kubectl apply -f ../user-service/k8s/user-service-stack.yml
 kubectl apply -f ../catalog-service/k8s/catalog-service-stack.yml
 kubectl apply -f ../payment-service/k8s/payment-service-stack.yml
 kubectl apply -f ./k8s/api-gateway/kong-service-stack.yml
 
+kubectl get svc kong-proxy-service -n fgc
+
+
 =========================================================================================================
 # Port Forward
 =========================================================================================================
-kubectl port-forward svc/kong-proxy-service -n fgc 30443:443
-kubectl port-forward svc/grafana-service -n observability 3000:3000
 kubectl port-forward svc/prometheus-service -n observability 9090:9090
-#Rabbit
-kubectl port-forward svc/rabbitmq-service -n fgc 15672:15672
+kubectl port-forward svc/grafana-service -n observability 3000:3000
+kubectl port-forward svc/kong-proxy-service 8443:443 -n fgc
 
 =========================================================================================================
 # Delete Stack

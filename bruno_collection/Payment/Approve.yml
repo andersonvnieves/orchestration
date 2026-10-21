@@ -12,6 +12,11 @@ http:
       type: query
   auth: inherit
 
+runtime:
+  variables:
+    - name: OrderId
+      value: tyestetet
+
 settings:
   encodeUrl: true
   timeout: 0

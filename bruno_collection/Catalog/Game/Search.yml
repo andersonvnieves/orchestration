@@ -1,0 +1,27 @@
+info:
+  name: Search
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseURL}}api/game/search?query={{GameSearch}}"
+  params:
+    - name: query
+      value: "{{GameSearch}}"
+      type: query
+  auth: inherit
+
+runtime:
+  variables:
+    - name: GameId
+      value: ad079687-6caa-412d-8c14-2cfca51df4a0
+    - name: GameSearch
+      value: horixon
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

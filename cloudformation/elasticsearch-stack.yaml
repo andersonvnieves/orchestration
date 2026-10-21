@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Template CloudFormation FGC - Amazon OpenSearch (Elasticsearch)'
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: 'ID do VPC onde a instancia sera implantada'
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: 'ID de APENAS UMA Subnet (mantém em Single-AZ para ser mais barato)'
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: 'Security group do cluster'
+  SearchUsername:
+    Type: String
+    Description: 'Master username for OpenSearch'
+  SearchPassword:
+    Type: String
+    Description: 'Master password (Min 8 chars, 1 upper, 1 lower, 1 number, 1 special)'
+    NoEcho: true
+
+Resources:
+  SearchDomain:
+    Type: AWS::OpenSearchService::Domain
+    Properties:
+      DomainName: fgc-search-domain
+      EngineVersion: OpenSearch_2.11
+      ClusterConfig:
+        InstanceCount: 1
+        InstanceType: t3.small.search
+        DedicatedMasterEnabled: false
+        ZoneAwarenessEnabled: false
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+        VolumeType: gp3
+      VPCOptions:
+        SubnetIds:
+          - !Ref SubnetId
+        SecurityGroupIds:
+          - !Ref SecurityGroupId
+      AdvancedSecurityOptions:
+        Enabled: true
+        InternalUserDatabaseEnabled: true
+        MasterUserOptions:
+          MasterUserName: !Ref SearchUsername
+          MasterUserPassword: !Ref SearchPassword
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+      EncryptionAtRestOptions:
+        Enabled: true
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+      AccessPolicies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: '*'
+            Action: 'es:*'
+            Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/fgc-search-domain/*"
+      Tags:
+        - Key: Name
+          Value: fgc-search-cluster
+
+  SearchSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 172.31.0.0/16
+
+Outputs:
+  SearchEndpoint:
+    Description: 'Endpoint do Amazon OpenSearch (HTTPS)'
+    Value: !GetAtt SearchDomain.DomainEndpoint
+    Export:
+      Name: !Sub "${AWS::StackName}-SearchEndpoint"
