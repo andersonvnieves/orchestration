@@ -1,69 +1,49 @@
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=fgc.local"
 
 =========================================================================================================
-#Create AWS environment
+# Create AWS environment
 =========================================================================================================
 aws cloudformation deploy --template-file cloudformation/ecr-stack.yaml --stack-name tc04-ecr --capabilities CAPABILITY_IAM
 aws cloudformation deploy --template-file cloudformation/sqs-stack.yaml --stack-name tc04-sqs --capabilities CAPABILITY_IAM
-
+aws cloudformation deploy --template-file cloudformation/rds-stack.yaml --stack-name tc04-rds --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" DBPassword="rohPav-juKmeb-DIhku9" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
+aws cloudformation deploy --template-file cloudformation/redis-stack.yaml --stack-name tc04-redis --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
+aws cloudformation deploy --template-file cloudformation/rabbitmq-stack.yml --stack-name tc04-rabbitmq --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0b6b4f48e357b2536" RabbitUser="admin" RabbitPassword="hnhU3z4zGHqB65F" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
+aws cloudformation deploy --template-file cloudformation/mongodb-stack.yaml --stack-name tc04-mongodb --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" MongoUsername="mongoadmin" MongoPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --region sa-east-1
 aws cloudformation deploy --template-file cloudformation/eks-stack.yaml --stack-name tc04-eks --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn="arn:aws:iam::230287251097:role/fgc-eks-cluster" NodeRoleArn="arn:aws:iam::230287251097:role/fgc-node-role" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5"
 
 =========================================================================================================
-#Deploy secrets amd parameters
+# Deploy secrets amd parameters
 =========================================================================================================
 chmod +x secrets.sh
 ./secrets.sh
 
 =========================================================================================================
-#Config local kubectl to work with AWS EKS Cluster
+# Config local kubectl to work with AWS EKS Cluster
 =========================================================================================================
 aws eks update-kubeconfig --region sa-east-1 --name fgc-cluster
 
 =========================================================================================================
-#Add External Secrets with Helm
+# Add External Secrets with Helm
 =========================================================================================================
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
-
 helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace --set installCRDs=true
 
 =========================================================================================================
-#Add EBS Driver with Helm
-=========================================================================================================
-
-helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-helm repo update
-
-helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver --namespace kube-system
-
-aws eks create-addon --cluster-name fgc-cluster --addon-name aws-ebs-csi-driver   --region sa-east-1
-
-
-kubectl rollout restart deployment ebs-csi-controller -n kube-system
-
-
-=========================================================================================================
-#Apply External Secrests on EKS cluster
+# Apply External Secrests on EKS cluster
 =========================================================================================================
 kubectl apply -f ./k8s/external-secrets-stack.yaml
 
 =========================================================================================================
-#Build Images. 
+# Build Images. 
 =========================================================================================================
-docker build -t fgc-catalog-service:latest -f ..\catalog-service\Dockerfile ..\catalog-service
-docker build -t fgc-payment-service:latest -f ..\payment-service\Dockerfile ..\payment-service
-docker build -t fgc-user-service:latest -f ..\user-service\Dockerfile ..\user-service
-
-macOS
 docker build -t fgc-catalog-service:latest -f ../catalog-service/Dockerfile ../catalog-service
 docker build -t fgc-payment-service:latest -f ../payment-service/Dockerfile ../payment-service
 docker build -t fgc-user-service:latest -f ../user-service/Dockerfile ../user-service
 
 =========================================================================================================
-#Apply Stack
+# Apply Stack
 =========================================================================================================
-macOS
-
 kubectl apply -f k8s/external-secrets-stack.yaml
 kubectl apply -f k8s/observability/prometheus-service-stack.yaml 
 kubectl apply -f k8s/observability/loki-service-stack.yaml
@@ -76,7 +56,7 @@ kubectl apply -f ../payment-service/k8s/payment-service-stack.yml
 kubectl apply -f ./k8s/api-gateway/kong-service-stack.yml
 
 =========================================================================================================
-#Port Forward
+# Port Forward
 =========================================================================================================
 kubectl port-forward svc/kong-proxy-service -n fgc 30443:443
 kubectl port-forward svc/grafana-service -n observability 3000:3000
@@ -85,13 +65,11 @@ kubectl port-forward svc/prometheus-service -n observability 9090:9090
 kubectl port-forward svc/rabbitmq-service -n fgc 15672:15672
 
 =========================================================================================================
-#Delete Stack
+# Delete Stack
 =========================================================================================================
 aws cloudformation delete-stack --stack-name tc04-ecr --region sa-east-1
 aws cloudformation delete-stack --stack-name tc04-sqs --region sa-east-1
 aws cloudformation delete-stack --stack-name tc04-eks --region sa-east-1
-
-
 
 kubectl delete -f  k8s\observability\local\prometheus-service-stack.yaml 
 kubectl delete -f  k8s\observability\local\loki-service-stack.yaml
@@ -102,7 +80,11 @@ kubectl delete -f ..\payment-service\k8s\payment-service-stack.yml
 kubectl delete -f ..\user-service\k8s\user-service-stack.yml
 kubectl delete -f .\k8s\api-gateway\local\kong-service-stack.yml
 
-
+=========================================================================================================
+# Add Triggers to notification lambda
+=========================================================================================================
 
 aws lambda create-event-source-mapping --function-name notification-service --event-source-arn arn:aws:sqs:sa-east-1:230287251097:user-created-queue --batch-size 10
 aws lambda create-event-source-mapping --function-name notification-service --event-source-arn arn:aws:sqs:sa-east-1:230287251097:payment-processed-queue --batch-size 10
+
+

@@ -1,43 +1,35 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Managed Amazon MQ (RabbitMQ engine)'
+Description: 'Template CloudFormation FGC - Amazon MQ (RabbitMQ engine)'
 
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
-    Description: VPC where the RabbitMQ broker will be deployed
-  SubnetIds:
+    Description: 'ID do VPC onde as instancias serao implantadas'
+  SubnetId:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: Subnet IDs (at least two) for the broker's subnet group
-  SecurityGroupId:
-    Type: AWS::EC2::SecurityGroup::Id
-    Description: SG allowing inbound on RabbitMQ ports (5672, 15672)
+    Description: 'ID da Subnet'
+  RabbitUser:
+    Type: String
+    Description: Master username for RabbitMQ
+  RabbitPassword:
+    Type: String
+    Description: Master password for RabbitMQ
+    NoEcho: true
 
 Resources:
-  RabbitMQSubnetGroup:
-    Type: AWS::AmazonMQ::Configuration
-    Properties:
-      EngineType: RabbitMQ
-      Name: fgc-rabbitmq-config
-      EngineVersion: "3.13.0"
-
   RabbitMQBroker:
     Type: AWS::AmazonMQ::Broker
     Properties:
       BrokerName: fgc-rabbitmq-broker
       EngineType: RabbitMQ
-      EngineVersion: "3.13.0"
-      HostInstanceType: mq.t3.micro
+      EngineVersion: "4.3"
+      HostInstanceType: mq.m7g.large
       DeploymentMode: SINGLE_INSTANCE
-      PubliclyAccessible: false
-      SubnetIds: !Ref SubnetIds
-      SecurityGroups:
-        - !Ref SecurityGroupId
+      PubliclyAccessible: true
+      SubnetIds: !Ref SubnetId
       Users:
-        - Username: {{resolve:ssm:/fgc/rabbitmq/default-user:1}}
-          Password: {{resolve:ssm-secure:/fgc/rabbitmq/default-pass:1}}
-      Configuration:
-        Id: !Ref RabbitMQSubnetGroup
-        Revision: 1
+        - Username: !Ref RabbitUser
+          Password: !Ref RabbitPassword
 
 Outputs:
   RabbitMQBrokerId:

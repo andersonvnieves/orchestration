@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Managed Redis cache'
+Description: 'Template CloudFormation FGC - ElastiCache'
 
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
-    Description: VPC for the cache
+    Description: 'ID do VPC onde as instancias serao implantadas'
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: Subnet IDs for the cache subnet group
+    Description: 'Lista de IDs de pelo menos 2 Subnets (em zonas de disponibilidade diferentes)'
   SecurityGroupId:
     Type: AWS::EC2::SecurityGroup::Id
-    Description: SG allowing inbound on port 6379
+    Description: 'Security group'
 
 Resources:
   RedisSubnetGroup:
@@ -22,6 +22,7 @@ Resources:
   RedisCache:
     Type: AWS::ElastiCache::CacheCluster
     Properties:
+      ClusterName: fgc-redis
       Engine: redis
       EngineVersion: "7.0"
       CacheNodeType: cache.t3.micro

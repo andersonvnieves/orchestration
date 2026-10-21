@@ -208,22 +208,6 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
 
 ### 4. Mensageria & Infraestrutura
 
-* **`/fgc/rabbitmq/default-user`**
-  * **Descrição:** Usuário padrão do RabbitMQ.
-  * **Tipo:** `String` (Parâmetro)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/rabbitmq/default-user' --type 'String' --value 'admin' --description 'Usuário padrão do RabbitMQ' --tier 'Standard' --overwrite
-    ```
-
-* **`/fgc/rabbitmq/default-pass`**
-  * **Descrição:** Senha padrão do RabbitMQ.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/rabbitmq/default-pass' --type 'SecureString' --value 'admin123' --description 'Senha padrão do RabbitMQ' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
-
 * **`/fgc/aws/region`**
   * **Descrição:** Região AWS da aplicação.
   * **Tipo:** `String` (Parâmetro)
@@ -265,14 +249,6 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
     ```
 
 ### 5. User Service
-
-* **`/fgc/users/sql-password`**
-  * **Descrição:** Senha SA do SQL Server do User Service.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/users/sql-password' --type 'SecureString' --value 'rohPav-juKmeb-DIhku9!' --description 'Senha SA do SQL Server do User Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
 
 * **`/fgc/users/connection-string`**
   * **Descrição:** Connection string do banco de dados do User Service.
@@ -316,14 +292,6 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
 
 ### 6. Catalog Service
 
-* **`/fgc/catalog/sql-password`**
-  * **Descrição:** Senha SA do SQL Server do Catalog Service.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/catalog/sql-password' --type 'SecureString' --value 'rohPav-juKmeb-DIhku9!' --description 'Senha SA do SQL Server do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
-
 * **`/fgc/catalog/connection-string`**
   * **Descrição:** Connection string do banco de dados SQL do Catalog Service.
   * **Tipo:** `SecureString` (Segredo)
@@ -338,22 +306,6 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
   * **Exemplo AWS CLI:**
     ```bash
     aws ssm put-parameter --name '/fgc/catalog/rabbitmq-uri' --type 'SecureString' --value 'amqp://admin:admin123@rabbitmq-service:5672/' --description 'URI de conexao com RabbitMQ para o Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
-
-* **`/fgc/catalog/mongo-user`**
-  * **Descrição:** Usuário root do MongoDB do Catalog Service.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/catalog/mongo-user' --type 'SecureString' --value 'mongoadmin' --description 'Usuario root do MongoDB do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
-
-* **`/fgc/catalog/mongo-password`**
-  * **Descrição:** Senha root do MongoDB do Catalog Service.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/catalog/mongo-password' --type 'SecureString' --value 'zessuq-8gyzda-jazhyN' --description 'Senha root do MongoDB do Catalog Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
     ```
 
 * **`/fgc/catalog/mongodb-uri`**
@@ -437,14 +389,6 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
     ```
 
 ### 7. Payment Service
-
-* **`/fgc/payment/sql-password`**
-  * **Descrição:** Senha SA do SQL Server do Payment Service.
-  * **Tipo:** `SecureString` (Segredo)
-  * **Exemplo AWS CLI:**
-    ```bash
-    aws ssm put-parameter --name '/fgc/payment/sql-password' --type 'SecureString' --value 'rohPav-juKmeb-DIhku9!' --description 'Senha SA do SQL Server do Payment Service' --key-id 'alias/aws/ssm' --tier 'Standard' --overwrite
-    ```
 
 * **`/fgc/payment/connection-string`**
   * **Descrição:** Connection string do banco de dados SQL do Payment Service.

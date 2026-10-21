@@ -1,23 +1,26 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'RDS Stack - SQL Server Express databases for catalog, user, and payment services'
+Description: 'Template CloudFormation FGC - RDS'
 
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
-    Description: VPC where the RDS instances will be deployed
+    Description: 'ID do VPC onde as instancias serao implantadas'
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: List of subnet IDs for the DB subnet group (at least two subnets in different AZs)
+    Description: 'Lista de IDs de pelo menos 2 Subnets (em zonas de disponibilidade diferentes)'
   SecurityGroupId:
     Type: AWS::EC2::SecurityGroup::Id
-    Description: Security group allowing access from application tier (e.g., EKS nodes)
-
+    Description: 'Security group'
+  DBPassword:
+    Type: String
+    Description: 'Master password for all SQL Server databases'
+    NoEcho: true
 
 Resources:
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
-      DBSubnetGroupDescription: Subnet group for RDS SQL Server instances
+      DBSubnetGroupDescription: Subnet group para RDS instance
       SubnetIds: !Ref SubnetIds
       Tags:
         - Key: Name
@@ -32,79 +35,24 @@ Resources:
       ToPort: 1433
       SourceSecurityGroupId: !Ref SecurityGroupId
 
-  DBSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: fgc-rds-credentials
-      Description: Credentials for catalog, user, and payment SQL Server databases
-      SecretString: !Sub |
-        {
-          "username": "${DBUsername}",
-          "password": "${DBPassword}"
-        }
-
-  CatalogDBInstance:
+  FGCDBInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: catalog-db
+      DBInstanceIdentifier: fgc-db
       Engine: sqlserver-ex
       EngineVersion: "15.00"
       DBInstanceClass: db.t3.micro
       AllocatedStorage: 20
       StorageType: gp2
       MasterUsername: sa
-      MasterUserPassword: {{resolve:ssm-secure:/fgc/catalog/sql-password:1}}
+      MasterUserPassword: !Ref DBPassword
       VPCSecurityGroups:
         - !Ref SecurityGroupId
       DBSubnetGroupName: !Ref DBSubnetGroup
       MultiAZ: false
-      PubliclyAccessible: false
+      PubliclyAccessible: true
       BackupRetentionPeriod: 7
       DeletionProtection: false
       Tags:
         - Key: Name
-          Value: catalog-db
-
-  UserDBInstance:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      DBInstanceIdentifier: user-db
-      Engine: sqlserver-ex
-      EngineVersion: "15.00"
-      DBInstanceClass: db.t3.micro
-      AllocatedStorage: 20
-      StorageType: gp2
-      MasterUsername: sa
-      MasterUserPassword: {{resolve:ssm-secure:/fgc/users/sql-password:1}}
-      VPCSecurityGroups:
-        - !Ref SecurityGroupId
-      DBSubnetGroupName: !Ref DBSubnetGroup
-      MultiAZ: false
-      PubliclyAccessible: false
-      BackupRetentionPeriod: 7
-      DeletionProtection: false
-      Tags:
-        - Key: Name
-          Value: user-db
-
-  PaymentDBInstance:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      DBInstanceIdentifier: payment-db
-      Engine: sqlserver-ex
-      EngineVersion: "15.00"
-      DBInstanceClass: db.t3.micro
-      AllocatedStorage: 20
-      StorageType: gp2
-      MasterUsername: sa
-      MasterUserPassword: {{resolve:ssm-secure:/fgc/payment/sql-password:1}}
-      VPCSecurityGroups:
-        - !Ref SecurityGroupId
-      DBSubnetGroupName: !Ref DBSubnetGroup
-      MultiAZ: false
-      PubliclyAccessible: false
-      BackupRetentionPeriod: 7
-      DeletionProtection: false
-      Tags:
-        - Key: Name
-          Value: payment-db
+          Value: fgc-db

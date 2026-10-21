@@ -4,11 +4,11 @@ Description: 'Template CloudFormation FGC - EKS'
 Parameters:
   ClusterRoleArn:
     Type: String
-    Description: 'ARN da IAM Role existente para o EKS Cluster (ex: LabRole da AWS Academy)'
+    Description: 'ARN da IAM Role existente para o EKS Cluster'
 
   NodeRoleArn:
     Type: String
-    Description: 'ARN da IAM Role existente para os Worker Nodes (ex: LabRole da AWS Academy)'
+    Description: 'ARN da IAM Role existente para os Worker Nodes'
 
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>

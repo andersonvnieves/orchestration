@@ -1,17 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Amazon DocumentDB (MongoDB‑compatible) for catalog-api'
+Description: 'Template CloudFormation FGC - Amazon DocumentDB'
 
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
-    Description: VPC where the DocumentDB cluster will be deployed
+    Description: 'ID do VPC onde as instancias serao implantadas'
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
-    Description: Subnet IDs (at least two) for the DB subnet group (different AZs)
+    Description: 'Lista de IDs de pelo menos 2 Subnets (em zonas de disponibilidade diferentes)'
   SecurityGroupId:
     Type: AWS::EC2::SecurityGroup::Id
-    Description: Security group allowing inbound on MongoDB port 27017
-
+    Description: 'Security group'
+  MongoUsername:
+    Type: String
+    Description: Master username for DocumentDB
+  MongoPassword:
+    Type: String
+    Description: Master password for DocumentDB
+    NoEcho: true
 
 Resources:
   DocDBSubnetGroup:
@@ -27,10 +33,9 @@ Resources:
     Type: AWS::DocDB::DBCluster
     Properties:
       DBClusterIdentifier: fgc-catalog-docdb-cluster
-      Engine: docdb
       EngineVersion: "4.0"
-      MasterUsername: {{resolve:ssm-secure:/fgc/catalog/mongo-user:1}}
-      MasterUserPassword: {{resolve:ssm-secure:/fgc/catalog/mongo-password:1}}
+      MasterUsername: !Ref MongoUsername
+      MasterUserPassword: !Ref MongoPassword
       DBSubnetGroupName: !Ref DocDBSubnetGroup
       VpcSecurityGroupIds:
         - !Ref SecurityGroupId
@@ -47,9 +52,7 @@ Resources:
     Properties:
       DBInstanceIdentifier: fgc-catalog-docdb-instance
       DBInstanceClass: db.t3.medium
-      Engine: docdb
       DBClusterIdentifier: !Ref DocDBCluster
-      PubliclyAccessible: false
       AutoMinorVersionUpgrade: true
 
 Outputs:
