@@ -396,6 +396,22 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
     aws ssm put-parameter --name '/fgc/catalog/elasticsearch-defaultindex' --type 'String' --value 'catalog' --description 'Default index do Elasticsearch' --tier 'Standard' --overwrite
     ```
 
+* **`/fgc/catalog/elasticsearch-username`**
+  * **Descrição:** usuario do Elasticsearch.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/elasticsearch-username' --type 'String' --value 'REPLACE_ME' --description 'Usuario do Elasticsearch' --tier 'Standard' --overwrite
+    ```
+
+* **`/fgc/catalog/elasticsearch-password`**
+  * **Descrição:** Default index do Elasticsearch.
+  * **Tipo:** `String` (Parâmetro)
+  * **Exemplo AWS CLI:**
+    ```bash
+    aws ssm put-parameter --name '/fgc/catalog/elasticsearch-password' --type 'String' --value 'REPLACE_ME' --description 'Senha do Elasticsearch' --tier 'Standard' --overwrite
+    ```
+
 ### 7. Payment Service
 
 * **`/fgc/payment/connection-string`**

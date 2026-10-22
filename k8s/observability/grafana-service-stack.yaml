@@ -12,7 +12,7 @@ spec:
   refreshInterval: 1h
   secretStoreRef:
     name: aws-parameter-store
-    kind: ClusterSecretStore   # Aponta para o ClusterSecretStore global
+    kind: ClusterSecretStore
   target:
     name: grafana-admin-credentials
     creationPolicy: Owner

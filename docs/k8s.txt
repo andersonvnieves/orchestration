@@ -10,10 +10,11 @@ aws cloudformation deploy --template-file cloudformation/redis-stack.yaml --stac
 aws cloudformation deploy --template-file cloudformation/rabbitmq-stack.yml --stack-name tc04-rabbitmq --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0b6b4f48e357b2536" SecurityGroupId="sg-00ad6a7b8ca81f960" RabbitUser="admin" RabbitPassword="hnhU3z4zGHqB65F" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 aws cloudformation deploy --template-file cloudformation/mongodb-stack.yaml --stack-name tc04-mongodb --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" MongoUsername="mongoadmin" MongoPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
-aws iam create-service-linked-role --aws-service-name es.amazonaws.com
+#Rodar apenas uma vez na conta -> aws iam create-service-linked-role --aws-service-name es.amazonaws.com
 aws cloudformation deploy --template-file cloudformation/elasticsearch-stack.yaml --stack-name tc04-elasticsearch --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" SearchUsername="searchadmin" SearchPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
 aws cloudformation deploy --template-file cloudformation/eks-stack.yaml --stack-name tc04-eks --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn="arn:aws:iam::230287251097:role/fgc-eks-cluster" NodeRoleArn="arn:aws:iam::230287251097:role/fgc-node-role" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5"
+
 
 =========================================================================================================
 # Deploy secrets amd parameters
@@ -29,26 +30,21 @@ aws eks update-kubeconfig --region sa-east-1 --name fgc-cluster
 =========================================================================================================
 # Add External Secrets with Helm
 =========================================================================================================
+eksctl delete iamserviceaccount --name external-secrets --namespace external-secrets --cluster fgc-cluster --wait
+
+eksctl utils associate-iam-oidc-provider --region=sa-east-1 --cluster=fgc-cluster --approve
+
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
-helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace  --set webhook.enabled=true --set installCRDs=true
+helm upgrade --install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace --set webhook.enabled=true --set installCRDs=true
 
-helm upgrade --install external-secrets external-secrets/external-secrets --namespace external-secrets --create-namespace --set webhook.enabled=true
-
-=========================================================================================================
-# Apply External Secrests on EKS cluster
-=========================================================================================================
-eksctl utils associate-iam-oidc-provider --region=sa-east-1 --cluster=fgc-cluster --approve
 eksctl create iamserviceaccount --name external-secrets --namespace external-secrets --cluster fgc-cluster --attach-policy-arn arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess --approve --override-existing-serviceaccounts
 
-kubectl apply -f ./k8s/external-secrets-stack.yaml
+kubectl rollout restart deployment external-secrets -n external-secrets
 
-=========================================================================================================
-# Build Images. 
-=========================================================================================================
-docker build -t fgc-catalog-service:latest -f ../catalog-service/Dockerfile ../catalog-service
-docker build -t fgc-payment-service:latest -f ../payment-service/Dockerfile ../payment-service
-docker build -t fgc-user-service:latest -f ../user-service/Dockerfile ../user-service
+# Pausa rápida de 10 segundos para garantir que o Pod novo assumiu
+
+kubectl apply -f ./k8s/external-secrets-stack.yaml
 
 =========================================================================================================
 # Apply Stack
@@ -68,29 +64,12 @@ kubectl apply -f ./k8s/api-gateway/kong-service-stack.yml
 
 kubectl get svc kong-proxy-service -n fgc
 
-
 =========================================================================================================
 # Port Forward
 =========================================================================================================
 kubectl port-forward svc/prometheus-service -n observability 9090:9090
 kubectl port-forward svc/grafana-service -n observability 3000:3000
 kubectl port-forward svc/kong-proxy-service 8443:443 -n fgc
-
-=========================================================================================================
-# Delete Stack
-=========================================================================================================
-aws cloudformation delete-stack --stack-name tc04-ecr --region sa-east-1
-aws cloudformation delete-stack --stack-name tc04-sqs --region sa-east-1
-aws cloudformation delete-stack --stack-name tc04-eks --region sa-east-1
-
-kubectl delete -f  k8s\observability\local\prometheus-service-stack.yaml 
-kubectl delete -f  k8s\observability\local\loki-service-stack.yaml
-kubectl delete -f  k8s\observability\base\promtail-daemon-stack.yaml
-kubectl delete -f  k8s\observability\local\grafana-service-stack.yaml
-kubectl delete -f ..\catalog-service\k8s\catalog-service-stack.yml
-kubectl delete -f ..\payment-service\k8s\payment-service-stack.yml
-kubectl delete -f ..\user-service\k8s\user-service-stack.yml
-kubectl delete -f .\k8s\api-gateway\local\kong-service-stack.yml
 
 =========================================================================================================
 # Add Triggers to notification lambda

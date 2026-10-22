@@ -18,7 +18,7 @@ http:
 runtime:
   variables:
     - name: baseURL
-      value: https://localhost:8443/
+      value: https://a81b9d5a2f12343838f6861e4d532b32-1398133033.sa-east-1.elb.amazonaws.com/
   scripts:
     - type: after-response
       code: |-
