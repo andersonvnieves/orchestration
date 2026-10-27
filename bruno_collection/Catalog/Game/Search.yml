@@ -17,7 +17,7 @@ runtime:
     - name: GameId
       value: ad079687-6caa-412d-8c14-2cfca51df4a0
     - name: GameSearch
-      value: horixon
+      value: gta
 
 settings:
   encodeUrl: true

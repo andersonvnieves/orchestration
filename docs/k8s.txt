@@ -7,6 +7,8 @@ aws cloudformation deploy --template-file cloudformation/ecr-stack.yaml --stack-
 aws cloudformation deploy --template-file cloudformation/sqs-stack.yaml --stack-name tc04-sqs --capabilities CAPABILITY_IAM
 aws cloudformation deploy --template-file cloudformation/rds-stack.yaml --stack-name tc04-rds --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" DBPassword="rohPav-juKmeb-DIhku9" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 aws cloudformation deploy --template-file cloudformation/redis-stack.yaml --stack-name tc04-redis --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+
+#RabbitMQ is only one that parameters change
 aws cloudformation deploy --template-file cloudformation/rabbitmq-stack.yml --stack-name tc04-rabbitmq --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetId="subnet-0b6b4f48e357b2536" SecurityGroupId="sg-00ad6a7b8ca81f960" RabbitUser="admin" RabbitPassword="hnhU3z4zGHqB65F" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 aws cloudformation deploy --template-file cloudformation/mongodb-stack.yaml --stack-name tc04-mongodb --parameter-overrides VpcId="vpc-042ce98be49b1d8c2" SubnetIds="subnet-0b6b4f48e357b2536,subnet-0841ce0b7d3ee06a5" SecurityGroupId="sg-00ad6a7b8ca81f960" MongoUsername="mongoadmin" MongoPassword="zessuq-8gyzda-jazhyN" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
@@ -30,9 +32,8 @@ aws eks update-kubeconfig --region sa-east-1 --name fgc-cluster
 =========================================================================================================
 # Add External Secrets with Helm
 =========================================================================================================
-eksctl delete iamserviceaccount --name external-secrets --namespace external-secrets --cluster fgc-cluster --wait
-
 eksctl utils associate-iam-oidc-provider --region=sa-east-1 --cluster=fgc-cluster --approve
+eksctl delete iamserviceaccount --name external-secrets --namespace external-secrets --cluster fgc-cluster --wait
 
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update

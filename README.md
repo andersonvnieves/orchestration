@@ -1,4 +1,4 @@
-# TC03 - Cloud Games — Orquestração
+# TC04 - Cloud Games — Orquestração
 
 Este repositório contém a infraestrutura de **orquestração e execução dos serviços desenvolvidos no Tech Challenge 03 (TC03)** em um ambiente **Kubernetes local**.
 O projeto reúne os manifests e scripts necessários para provisionar e executar os microsserviços que compõem a solução, além dos recursos externos utilizados pela aplicação na **AWS**.
@@ -74,15 +74,13 @@ A utilização de uma stack open source e self-hosted mantém as métricas e os 
 
 Essa abordagem reduz a dependência de provedores externos de observabilidade e proporciona maior previsibilidade sobre armazenamento, retenção e custos de ingestão, além de facilitar o atendimento a requisitos internos de governança e controle dos dados.
 
-# Execução local
+# Atenção: Execução Local Descontinuada
 
-Seguindo as instruções apresentadas neste README, é possível configurar toda a infraestrutura necessária e executar o projeto em um **cluster Kubernetes local**, utilizando soluções como **Kind** ou **Minikube**.
+Para refletir um ambiente de produção real e altamente escalável, **este projeto não possui mais suporte a execução local** (via `docker-compose` ou `dotnet run`). 
 
-O processo de inicialização contempla desde a preparação do cluster e provisionamento dos recursos AWS até a implantação dos microsserviços, da camada de observabilidade e do API Gateway.
+Toda a infraestrutura necessária para rodar os microsserviços deve ser provisionada na AWS através das nossas stacks do CloudFormation.
 
-A arquitetura resultante permite reproduzir localmente um ambiente distribuído composto por **microsserviços, comunicação assíncrona, persistência, cache, observabilidade e API Gateway**, utilizando Kubernetes como plataforma de orquestração.
-
-> **Pré-requisitos:** antes de iniciar a execução, certifique-se de possuir Docker, Kubernetes, `kubectl`, Kind ou Minikube e AWS CLI v2 instalados e configurados.
+---
 
 ## Clonar os repositórios
 
@@ -104,16 +102,43 @@ git clone https://github.com/andersonvnieves/payment-service.git
 git clone https://github.com/andersonvnieves/notification-service.git
 ```
 
-## AWS — SQS (CloudFormation)
+## AWS — Infraestrutura (CloudFormation)
 
-Após configurar a AWS CLI, devem ser provisionadas as stacks responsáveis pelos recursos externos utilizados pela aplicação.
+Após configurar a AWS CLI, devem ser provisionadas as stacks responsáveis pelos recursos externos utilizados pela aplicação. Execute os comandos abaixo para criar o ambiente na AWS.
 
-### Criar as filas SQS
-
-Na pasta cloudformation temos o arquivo sqs-stack.yaml responsável por criar as duas filas sqs dos evnetos que a aplicação utiliza: user-created-queue e payment-processed-queue. Execute o comando abaixo para criar as duas filas na sua conta.
-
+### ECR
 ```bash
-aws cloudformation deploy --template-file .\cloudformation\sqs-stack.yaml --stack-name sqs-stack --capabilities CAPABILITY_IAM
+aws cloudformation deploy --template-file cloudformation/ecr-stack.yaml --stack-name tc04-ecr --capabilities CAPABILITY_IAM
+```
+
+### SQS
+```bash
+aws cloudformation deploy --template-file cloudformation/sqs-stack.yaml --stack-name tc04-sqs --capabilities CAPABILITY_IAM
+```
+
+### RDS
+```bash
+aws cloudformation deploy --template-file cloudformation/rds-stack.yaml --stack-name tc04-rds --parameter-overrides VpcId="<YOUR_VPC_ID>" SubnetIds="<YOUR_SUBNET_ID_1>,<YOUR_SUBNET_ID_2>" SecurityGroupId="<YOUR_SECURITY_GROUP_ID>" DBPassword="<YOUR_DB_PASSWORD>" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+```
+
+### Redis (Elasticache)
+```bash
+aws cloudformation deploy --template-file cloudformation/redis-stack.yaml --stack-name tc04-redis --parameter-overrides VpcId="<YOUR_VPC_ID>" SubnetIds="<YOUR_SUBNET_ID_1>,<YOUR_SUBNET_ID_2>" SecurityGroupId="<YOUR_SECURITY_GROUP_ID>" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+```
+
+### RabbitMQ (Amazon MQ)
+```bash
+aws cloudformation deploy --template-file cloudformation/rabbitmq-stack.yml --stack-name tc04-rabbitmq --parameter-overrides VpcId="<YOUR_VPC_ID>" SubnetId="<YOUR_SUBNET_ID>" SecurityGroupId="<YOUR_SECURITY_GROUP_ID>" RabbitUser="<YOUR_RABBITMQ_USER>" RabbitPassword="<YOUR_RABBITMQ_PASSWORD>" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+```
+
+### Elasticsearch (Amazon Opensearch)
+```bash
+aws cloudformation deploy --template-file cloudformation/elasticsearch-stack.yaml --stack-name tc04-elasticsearch --parameter-overrides VpcId="<YOUR_VPC_ID>" SubnetId="<YOUR_SUBNET_ID>" SecurityGroupId="<YOUR_SECURITY_GROUP_ID>" SearchUsername="<YOUR_OPENSEARCH_USER>" SearchPassword="<YOUR_OPENSEARCH_PASSWORD>" --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+```
+
+### EKS
+```bash
+aws cloudformation deploy --template-file cloudformation/eks-stack.yaml --stack-name tc04-eks --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM --parameter-overrides ClusterRoleArn="<YOUR_CLUSTER_ROLE_ARN>" NodeRoleArn="<YOUR_NODE_ROLE_ARN>" SubnetIds="<YOUR_SUBNET_ID_1>,<YOUR_SUBNET_ID_2>"
 ```
 
 ## Parâmetros e Segredos do AWS Systems Manager (Parameter Store)
@@ -462,13 +487,57 @@ Abaixo estão listados todos os parâmetros utilizados pela aplicação FGC, div
     aws ssm put-parameter --name '/fgc/payment/payment-processed-routing-key' --type 'String' --value 'payment.processed' --description 'Routing Key RabbitMQ Payment Processed no Payment Service' --tier 'Standard' --overwrite
     ```
 
-### Sincronizar com o Kubernetes via External Secrets Operator
+### External Secrets Operator (Helm)
 
-Para integrar os valores salvos no AWS Parameter Store com o Kubernetes, aplique a stack do External Secrets Operator:
+Para que o cluster EKS possa recuperar senhas e configurações de forma segura (como as credenciais do banco de dados e mensageria) diretamente da AWS, é necessário instalar e configurar o **External Secrets Operator**.
 
+Certifique-se de ter o `eksctl` e o `helm` instalados na sua máquina. Em seguida, execute os comandos abaixo:
+
+
+### 1. Associar o provedor OIDC do IAM ao cluster EKS
 ```bash
-kubectl apply -f .\k8s\external-secrets-stack.yaml
+eksctl utils associate-iam-oidc-provider --region=<YOUR_REGION> --cluster=<YOUR_CLUSTER_NAME> --approve
 ```
+
+### 2. Limpar Service Account anterior (caso exista, para evitar conflitos)
+```bash
+eksctl delete iamserviceaccount --name external-secrets --namespace external-secrets --cluster <YOUR_CLUSTER_NAME> --wait
+```
+
+### 3. Adicionar o repositório e instalar o External Secrets via Helm
+```bash
+helm repo add external-secrets [https://charts.external-secrets.io](https://charts.external-secrets.io)
+helm repo update
+helm upgrade --install external-secrets external-secrets/external-secrets \
+  -n external-secrets \
+  --create-namespace \
+  --set webhook.enabled=true \
+  --set installCRDs=true
+```
+
+### 4. Criar a IAM Service Account com permissão de leitura no AWS SSM Parameter Store/Secrets Manager
+```bash
+eksctl create iamserviceaccount \
+  --name external-secrets \
+  --namespace external-secrets \
+  --cluster <YOUR_CLUSTER_NAME> \
+  --attach-policy-arn arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess \
+  --approve \
+  --override-existing-serviceaccounts
+```
+
+### 5. Reiniciar o deployment para que os pods assumam a nova role do IAM vinculada
+```bash
+kubectl rollout restart deployment external-secrets -n external-secrets
+```
+
+### 6. Aguarde aproximadamente 10 segundos para garantir que o novo Pod assumiu corretamente
+
+### 7. Aplicar os manifestos do Kubernetes contendo o SecretStore e os ExternalSecrets da aplicação
+```bash
+kubectl apply -f ./k8s/external-secrets-stack.yaml
+```
+
 
 ### Deploy Notifications Lambda
 
@@ -510,27 +579,6 @@ kubectl apply -f  k8s\observability\promtail-daemon-stack.yaml
 kubectl apply -f  k8s\observability\grafana-service-stack.yaml
 ```
 
-## Kubernetes — Build das imagens dos microserviços
-
-Com todos os repositórios clonados na pasta indicada, execute os comandos a seguir para gerar as imagens dos microserviços:
-
-```bash
-docker build -t fgc-catalog-service:latest -f ..\catalog-service\Dockerfile ..\catalog-service
-```
-
-```bash
-docker build -t fgc-payment-service:latest -f ..\payment-service\Dockerfile ..\payment-service
-```
-
-```bash
-docker build -t fgc-user-service:latest -f ..\user-service\Dockerfile ..\user-service
-```
-
-## Kubernetes — Ajustar parametros nas stask dos microserviços
-
-Alguns parametros tem que ser ajustados nas stacks de cada mciroserviço antes de aplicar a stack no cluster,
-procure o README.md de cada projeto para mais detalhes e substitua as credenciais do AWS, a arn das filas sqs criadas.
-
 ## Kubernetes — Stacks dos microserviços
 
 Aplique a stack de cada mciroserviço com os comandos abaixo:
@@ -555,26 +603,12 @@ Rode o comando abaixo para aplicar a stack do kong:
 kubectl apply -f .\k8s\api-gateway\kong-service-stack.yml
 ```
 
-## Kubernetes — Port Forward
+## Acesso do API Gateway (kong) pela internet
 
-Dependendo do seu ambiente e do seu cluster k8s, pode ser necessário fazer encaminhamento de porta para acessar os serviços, execute os comandos abaixo de acordo com sua necessidade:
+O EKS vai criar um NLB para acesso externo ao cluster, utilize o comando a seguir para pegar a URL do NLB associado ao serviço do kong.
 
-### Kong (api gateway)
 ```bash
-kubectl port-forward svc/kong-proxy-service -n fgc 30443:443
+kubectl get svc kong-proxy-service -n fgc
 ```
 
-### Grafana
-```bash
-kubectl port-forward svc/grafana-service -n observability 3000:3000
-```
-
-### Prometheus
-```bash
-kubectl port-forward svc/prometheus-service -n observability 9090:9090
-```
-
-### RabbitMQ (management)
-```bash
-kubectl port-forward svc/rabbitmq-service -n fgc 15672:15672
-```
+Basta fazer das chamadas na porta 3000 com https para o endereço que o comando mostrou.
